@@ -1,8 +1,12 @@
 Rails.application.routes.draw do
+  # Authentication
   resource :session
+  resource :registration, only: [ :new, :create ]
   resources :passwords, param: :token
 
-  # OmniAuth routes
+  # OmniAuth routes - support both GET and POST callbacks
+  # (Google uses GET, some providers use POST)
+  get "/auth/:provider/callback", to: "omniauth_callbacks#create"
   post "/auth/:provider/callback", to: "omniauth_callbacks#create"
   get "/auth/failure", to: "omniauth_callbacks#failure"
 
@@ -16,6 +20,6 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Homepage
+  root "pages#home"
 end

@@ -46,17 +46,39 @@ cp .env.example .env
 
 ### Microsoft OAuth2
 
-1. Go to [Azure Portal](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade)
+1. Go to [Azure Portal - App Registrations](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade)
 2. Click "New registration"
 3. Enter a name for your application
-4. Choose supported account types (e.g., "Accounts in any organizational directory and personal Microsoft accounts")
-5. Add redirect URIs under "Web":
-   - Development: `http://localhost:3000/auth/microsoft_graph/callback`
-   - Production: `https://yourdomain.com/auth/microsoft_graph/callback`
-6. Go to "Certificates & secrets" and create a new client secret
-7. Copy the Application (client) ID and client secret value to your `.env` file
+4. **Important**: Choose the correct supported account types:
+   - For personal Microsoft accounts (consumer): Select **"Accounts in any organizational directory and personal Microsoft accounts"** or **"Personal Microsoft accounts only"**
+   - The error "unauthorized_client: The client does not exist or is not enabled for consumers" means your app is configured for organizational accounts only
+5. Add redirect URIs:
+   - Click "Add a platform" → "Web"
+   - Add redirect URI: `http://localhost:3000/auth/microsoft_graph/callback` (development)
+   - Add redirect URI: `https://yourdomain.com/auth/microsoft_graph/callback` (production)
+6. **Configure API Permissions** (required for scopes):
+   - Go to "API permissions" in the left sidebar
+   - Click "Add a permission" → "Microsoft Graph" → "Delegated permissions"
+   - Add the following permissions:
+     - `openid` (under OpenId permissions)
+     - `email` (under OpenId permissions)
+     - `profile` (under OpenId permissions)
+   - Click "Add permissions"
+   - Note: Admin consent is NOT required for these basic permissions
+7. Go to "Certificates & secrets" → "Client secrets" → "New client secret"
+   - Add a description and choose expiration
+   - **Copy the secret Value immediately** (it won't be shown again)
+8. Go to "Overview" and copy the "Application (client) ID"
+9. Add to your `.env` file:
+   - `MICROSOFT_CLIENT_ID`: Application (client) ID from Overview
+   - `MICROSOFT_CLIENT_SECRET`: Secret Value from step 7
 
 **Required Scopes**: `openid`, `email`, `profile`
+
+**Troubleshooting Microsoft OAuth**:
+- "unauthorized_client" error: Check that your app supports the account type you're trying to sign in with (personal vs. organizational)
+- To change account types: Go to "Authentication" → "Supported account types" and update the selection
+- If you change account types, you may need to create a new app registration
 
 ## How It Works
 
@@ -133,5 +155,6 @@ For local development, you may need to:
 ## Routes
 
 - `POST /auth/:provider` - Initiates OAuth flow
-- `POST /auth/:provider/callback` - OAuth callback handler
+- `GET /auth/:provider/callback` - OAuth callback handler (Google uses GET)
+- `POST /auth/:provider/callback` - OAuth callback handler (some providers use POST)
 - `GET /auth/failure` - OAuth failure handler

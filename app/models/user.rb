@@ -9,7 +9,20 @@ class User < ApplicationRecord
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :password, presence: true, length: { minimum: 8 }, if: -> { password_digest.nil? || !password.nil? }
+  validates :password, presence: true, length: { minimum: 8 }, if: :password_required?
+  validates :password, confirmation: true, if: -> { password.present? }
+  validates :password_confirmation, presence: true, if: -> { password.present? && password_confirmation_required? }
+
+  attr_accessor :password_confirmation_required
+
+  def password_confirmation_required?
+    password_confirmation_required
+  end
+
+  def password_required?
+    # Password is required if no password_digest exists (new user) and no OAuth identity
+    password_digest.nil? || password.present?
+  end
 
   private
 

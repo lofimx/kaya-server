@@ -27,6 +27,9 @@ gem "omniauth-apple"
 gem "omniauth-microsoft_graph"
 gem "omniauth-rails_csrf_protection"
 
+# Load environment variables from .env file
+gem "dotenv-rails", groups: [ :development, :test ]
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

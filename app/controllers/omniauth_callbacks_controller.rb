@@ -17,7 +17,7 @@ class OmniauthCallbacksController < ApplicationController
       # Set the session cookie
       cookies.signed.permanent[:session_id] = { value: session.id, httponly: true, same_site: :lax }
 
-      redirect_to root_path, notice: "Successfully signed in with #{auth.provider.titleize}!"
+      redirect_to root_path, notice: "Successfully signed in with #{auth.provider.to_s.titleize}!"
     rescue ActiveRecord::RecordInvalid => e
       redirect_to new_session_path, alert: "Authentication failed: #{e.message}"
     end
