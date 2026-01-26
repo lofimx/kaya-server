@@ -45,7 +45,8 @@ class User < ApplicationRecord
       unless user
         user = User.create!(
           email_address: auth.info.email,
-          password: SecureRandom.hex(32) # Random password for OAuth users
+          password: SecureRandom.hex(32), # Random password for OAuth users
+          incidental_password: true
         )
       end
 

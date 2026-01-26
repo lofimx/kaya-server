@@ -36,7 +36,14 @@ class AccountsController < ApplicationController
   def update_password
     @user.password_confirmation_required = true
 
-    if params[:current_password].blank?
+    if @user.incidental_password?
+      # User created via OAuth - no current password required
+      if @user.update(password_params.merge(incidental_password: false))
+        redirect_to account_path, notice: "Password has been set."
+      else
+        redirect_to account_path, alert: @user.errors.full_messages.join(", ")
+      end
+    elsif params[:current_password].blank?
       redirect_to account_path, alert: "Current password is required."
     elsif !@user.authenticate(params[:current_password])
       redirect_to account_path, alert: "Current password is incorrect."

@@ -33,6 +33,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_07_040122) do
   create_table "users", id: { type: :string, limit: 36 }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
+    t.boolean "incidental_password", default: false, null: false
     t.string "password_digest"
     t.datetime "updated_at", null: false
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
