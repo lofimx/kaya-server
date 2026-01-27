@@ -38,6 +38,12 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # App routes (authenticated)
+  scope "/app", as: "app" do
+    get "/", to: redirect("/app/everything")
+    get "everything", to: "everything#index"
+  end
+
   # Homepage
   root "pages#home"
 end

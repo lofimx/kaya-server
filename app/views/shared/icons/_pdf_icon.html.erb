@@ -1,0 +1,162 @@
+<%# Pixelated PDF icon - 32x32 pixel simulation using squares %>
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="image-rendering: pixelated;">
+
+  <%# Document background - white %>
+  <% (4..27).each do |y| %>
+    <% (6..23).each do |x| %>
+      <% next if y < 10 && x > 19 %>
+      <rect x="<%= x %>" y="<%= y %>" width="1" height="1" fill="#FFFFFF"/>
+    <% end %>
+  <% end %>
+
+  <%# Document border - dark gray left and top %>
+  <% (4..27).each do |y| %>
+    <rect x="6" y="<%= y %>" width="1" height="1" fill="#808080"/>
+  <% end %>
+  <% (6..19).each do |x| %>
+    <rect x="<%= x %>" y="4" width="1" height="1" fill="#808080"/>
+  <% end %>
+
+  <%# Document border - black right and bottom %>
+  <% (10..27).each do |y| %>
+    <rect x="23" y="<%= y %>" width="1" height="1" fill="#000000"/>
+  <% end %>
+  <% (6..23).each do |x| %>
+    <rect x="<%= x %>" y="27" width="1" height="1" fill="#000000"/>
+  <% end %>
+
+  <%# Folded corner - diagonal line %>
+  <rect x="20" y="4" width="1" height="1" fill="#808080"/>
+  <rect x="21" y="5" width="1" height="1" fill="#808080"/>
+  <rect x="22" y="6" width="1" height="1" fill="#808080"/>
+  <rect x="23" y="7" width="1" height="1" fill="#808080"/>
+  <rect x="23" y="8" width="1" height="1" fill="#000000"/>
+  <rect x="23" y="9" width="1" height="1" fill="#000000"/>
+
+  <%# Fold area - gray %>
+  <rect x="20" y="5" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="20" y="6" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="20" y="7" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="20" y="8" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="20" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="21" y="6" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="21" y="7" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="21" y="8" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="21" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="22" y="7" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="22" y="8" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="22" y="9" width="1" height="1" fill="#C0C0C0"/>
+
+  <%# Red banner background %>
+  <% (19..25).each do |y| %>
+    <% (7..22).each do |x| %>
+      <rect x="<%= x %>" y="<%= y %>" width="1" height="1" fill="#CC0000"/>
+    <% end %>
+  <% end %>
+
+  <%# Red banner border - darker red %>
+  <% (7..22).each do |x| %>
+    <rect x="<%= x %>" y="19" width="1" height="1" fill="#990000"/>
+  <% end %>
+  <% (19..25).each do |y| %>
+    <rect x="7" y="<%= y %>" width="1" height="1" fill="#990000"/>
+  <% end %>
+
+  <%# "PDF" text in white pixels %>
+  <%# P %>
+  <rect x="9" y="21" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="9" y="22" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="9" y="23" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="9" y="24" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="10" y="21" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="11" y="21" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="11" y="22" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="10" y="22" width="1" height="1" fill="#FFFFFF"/>
+
+  <%# D %>
+  <rect x="13" y="21" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="13" y="22" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="13" y="23" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="13" y="24" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="14" y="21" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="14" y="24" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="15" y="22" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="15" y="23" width="1" height="1" fill="#FFFFFF"/>
+
+  <%# F %>
+  <rect x="17" y="21" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="17" y="22" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="17" y="23" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="17" y="24" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="18" y="21" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="19" y="21" width="1" height="1" fill="#FFFFFF"/>
+  <rect x="18" y="22" width="1" height="1" fill="#FFFFFF"/>
+
+  <%# Document content lines - gray %>
+  <rect x="8" y="7" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="9" y="7" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="10" y="7" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="11" y="7" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="12" y="7" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="13" y="7" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="14" y="7" width="1" height="1" fill="#C0C0C0"/>
+
+  <rect x="8" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="9" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="10" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="11" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="12" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="13" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="14" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="15" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="16" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="17" y="9" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="18" y="9" width="1" height="1" fill="#C0C0C0"/>
+
+  <rect x="8" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="9" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="10" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="11" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="12" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="13" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="14" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="15" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="16" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="17" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="18" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="19" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="20" y="11" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="21" y="11" width="1" height="1" fill="#C0C0C0"/>
+
+  <rect x="8" y="13" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="9" y="13" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="10" y="13" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="11" y="13" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="12" y="13" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="13" y="13" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="14" y="13" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="15" y="13" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="16" y="13" width="1" height="1" fill="#C0C0C0"/>
+
+  <rect x="8" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="9" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="10" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="11" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="12" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="13" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="14" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="15" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="16" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="17" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="18" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="19" y="15" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="20" y="15" width="1" height="1" fill="#C0C0C0"/>
+
+  <rect x="8" y="17" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="9" y="17" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="10" y="17" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="11" y="17" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="12" y="17" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="13" y="17" width="1" height="1" fill="#C0C0C0"/>
+  <rect x="14" y="17" width="1" height="1" fill="#C0C0C0"/>
+</svg>

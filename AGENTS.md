@@ -86,6 +86,14 @@ The primary interface to Kaya is its API. The API allows users to authenticate t
 
 ---
 
+## Design
+
+Visual design should follow the [GNOME brand guidelines](https://brand.gnome.org/) for typography and colors.
+
+UI and UX should follow the [GNOME Human Interface Guidelines](https://developer.gnome.org/hig/) to the extent that they apply to the web.
+
+---
+
 ## Development Workflows
 
 When adding a new feature:

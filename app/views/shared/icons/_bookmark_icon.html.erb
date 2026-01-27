@@ -1,0 +1,144 @@
+<%# Pixelated IE5-style internet shortcut icon - 32x32 pixel simulation %>
+<svg width="64" height="64" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" style="image-rendering: pixelated;">
+  <style>
+    .p { width: 1px; height: 1px; }
+  </style>
+
+  <%# Document background - cream/white %>
+  <% (4..27).each do |y| %>
+    <% (4..21).each do |x| %>
+      <% next if y < 10 && x > 17 %>
+      <rect x="<%= x %>" y="<%= y %>" class="p" fill="#FFFFFC"/>
+    <% end %>
+  <% end %>
+
+  <%# Document border - dark gray %>
+  <%# Left edge %>
+  <% (4..27).each do |y| %>
+    <rect x="4" y="<%= y %>" class="p" fill="#808080"/>
+  <% end %>
+  <%# Bottom edge %>
+  <% (4..21).each do |x| %>
+    <rect x="<%= x %>" y="27" class="p" fill="#808080"/>
+  <% end %>
+  <%# Top edge (before fold) %>
+  <% (4..17).each do |x| %>
+    <rect x="<%= x %>" y="4" class="p" fill="#808080"/>
+  <% end %>
+  <%# Right edge (below fold) %>
+  <% (10..27).each do |y| %>
+    <rect x="21" y="<%= y %>" class="p" fill="#808080"/>
+  <% end %>
+
+  <%# Folded corner - diagonal %>
+  <rect x="18" y="4" class="p" fill="#808080"/>
+  <rect x="19" y="5" class="p" fill="#808080"/>
+  <rect x="20" y="6" class="p" fill="#808080"/>
+  <rect x="21" y="7" class="p" fill="#808080"/>
+  <rect x="21" y="8" class="p" fill="#808080"/>
+  <rect x="21" y="9" class="p" fill="#808080"/>
+
+  <%# Fold shadow area %>
+  <rect x="18" y="5" class="p" fill="#C0C0C0"/>
+  <rect x="18" y="6" class="p" fill="#C0C0C0"/>
+  <rect x="18" y="7" class="p" fill="#C0C0C0"/>
+  <rect x="18" y="8" class="p" fill="#C0C0C0"/>
+  <rect x="18" y="9" class="p" fill="#C0C0C0"/>
+  <rect x="19" y="6" class="p" fill="#C0C0C0"/>
+  <rect x="19" y="7" class="p" fill="#C0C0C0"/>
+  <rect x="19" y="8" class="p" fill="#C0C0C0"/>
+  <rect x="19" y="9" class="p" fill="#C0C0C0"/>
+  <rect x="20" y="7" class="p" fill="#C0C0C0"/>
+  <rect x="20" y="8" class="p" fill="#C0C0C0"/>
+  <rect x="20" y="9" class="p" fill="#C0C0C0"/>
+
+  <%# Globe - blue sphere background (center around 12,18) %>
+  <%# Blue circle pixels %>
+  <rect x="9" y="15" class="p" fill="#0000AA"/>
+  <rect x="10" y="14" class="p" fill="#0000AA"/>
+  <rect x="11" y="13" class="p" fill="#0000AA"/>
+  <rect x="12" y="13" class="p" fill="#0000AA"/>
+  <rect x="13" y="13" class="p" fill="#0000AA"/>
+  <rect x="14" y="14" class="p" fill="#0000AA"/>
+  <rect x="15" y="15" class="p" fill="#0000AA"/>
+  <rect x="15" y="16" class="p" fill="#0000AA"/>
+  <rect x="15" y="17" class="p" fill="#0000AA"/>
+  <rect x="15" y="18" class="p" fill="#0000AA"/>
+  <rect x="15" y="19" class="p" fill="#0000AA"/>
+  <rect x="14" y="20" class="p" fill="#0000AA"/>
+  <rect x="13" y="21" class="p" fill="#0000AA"/>
+  <rect x="12" y="21" class="p" fill="#0000AA"/>
+  <rect x="11" y="21" class="p" fill="#0000AA"/>
+  <rect x="10" y="20" class="p" fill="#0000AA"/>
+  <rect x="9" y="19" class="p" fill="#0000AA"/>
+  <rect x="9" y="18" class="p" fill="#0000AA"/>
+  <rect x="9" y="17" class="p" fill="#0000AA"/>
+  <rect x="9" y="16" class="p" fill="#0000AA"/>
+
+  <%# Globe fill - lighter blue %>
+  <rect x="10" y="15" class="p" fill="#0055DD"/>
+  <rect x="10" y="16" class="p" fill="#0055DD"/>
+  <rect x="10" y="17" class="p" fill="#0055DD"/>
+  <rect x="10" y="18" class="p" fill="#0055DD"/>
+  <rect x="10" y="19" class="p" fill="#0055DD"/>
+  <rect x="11" y="14" class="p" fill="#0055DD"/>
+  <rect x="11" y="15" class="p" fill="#0055DD"/>
+  <rect x="11" y="16" class="p" fill="#0055DD"/>
+  <rect x="11" y="17" class="p" fill="#0055DD"/>
+  <rect x="11" y="18" class="p" fill="#0055DD"/>
+  <rect x="11" y="19" class="p" fill="#0055DD"/>
+  <rect x="11" y="20" class="p" fill="#0055DD"/>
+  <rect x="12" y="14" class="p" fill="#0055DD"/>
+  <rect x="12" y="15" class="p" fill="#0055DD"/>
+  <rect x="12" y="16" class="p" fill="#0055DD"/>
+  <rect x="12" y="17" class="p" fill="#0055DD"/>
+  <rect x="12" y="18" class="p" fill="#0055DD"/>
+  <rect x="12" y="19" class="p" fill="#0055DD"/>
+  <rect x="12" y="20" class="p" fill="#0055DD"/>
+  <rect x="13" y="14" class="p" fill="#0055DD"/>
+  <rect x="13" y="15" class="p" fill="#0055DD"/>
+  <rect x="13" y="16" class="p" fill="#0055DD"/>
+  <rect x="13" y="17" class="p" fill="#0055DD"/>
+  <rect x="13" y="18" class="p" fill="#0055DD"/>
+  <rect x="13" y="19" class="p" fill="#0055DD"/>
+  <rect x="13" y="20" class="p" fill="#0055DD"/>
+  <rect x="14" y="15" class="p" fill="#0055DD"/>
+  <rect x="14" y="16" class="p" fill="#0055DD"/>
+  <rect x="14" y="17" class="p" fill="#0055DD"/>
+  <rect x="14" y="18" class="p" fill="#0055DD"/>
+  <rect x="14" y="19" class="p" fill="#0055DD"/>
+
+  <%# Globe grid lines - white %>
+  <rect x="12" y="13" class="p" fill="#FFFFFF"/>
+  <rect x="12" y="14" class="p" fill="#FFFFFF"/>
+  <rect x="12" y="15" class="p" fill="#FFFFFF"/>
+  <rect x="12" y="16" class="p" fill="#FFFFFF"/>
+  <rect x="12" y="17" class="p" fill="#FFFFFF"/>
+  <rect x="12" y="18" class="p" fill="#FFFFFF"/>
+  <rect x="12" y="19" class="p" fill="#FFFFFF"/>
+  <rect x="12" y="20" class="p" fill="#FFFFFF"/>
+  <rect x="12" y="21" class="p" fill="#FFFFFF"/>
+  <rect x="9" y="17" class="p" fill="#FFFFFF"/>
+  <rect x="10" y="17" class="p" fill="#FFFFFF"/>
+  <rect x="11" y="17" class="p" fill="#FFFFFF"/>
+  <rect x="13" y="17" class="p" fill="#FFFFFF"/>
+  <rect x="14" y="17" class="p" fill="#FFFFFF"/>
+  <rect x="15" y="17" class="p" fill="#FFFFFF"/>
+
+  <%# Yellow "e" orbit ring %>
+  <rect x="8" y="17" class="p" fill="#FFD700"/>
+  <rect x="9" y="14" class="p" fill="#FFD700"/>
+  <rect x="10" y="13" class="p" fill="#FFD700"/>
+  <rect x="14" y="13" class="p" fill="#FFD700"/>
+  <rect x="15" y="14" class="p" fill="#FFD700"/>
+  <rect x="16" y="15" class="p" fill="#FFD700"/>
+  <rect x="16" y="16" class="p" fill="#FFD700"/>
+  <rect x="16" y="17" class="p" fill="#FFD700"/>
+  <rect x="16" y="18" class="p" fill="#FFD700"/>
+  <rect x="16" y="19" class="p" fill="#FFD700"/>
+  <rect x="15" y="20" class="p" fill="#FFD700"/>
+  <rect x="14" y="21" class="p" fill="#FFD700"/>
+  <rect x="10" y="21" class="p" fill="#FFD700"/>
+  <rect x="9" y="20" class="p" fill="#FFD700"/>
+  <rect x="8" y="18" class="p" fill="#FFD700"/>
+</svg>
