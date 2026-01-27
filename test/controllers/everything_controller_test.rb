@@ -2,7 +2,7 @@ require "test_helper"
 
 class EverythingControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = users(:one)
+    @user = create(:user)
     sign_in_as(@user)
   end
 
@@ -19,8 +19,8 @@ class EverythingControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index shows angas in reverse chronological order" do
-    anga1 = create_anga(@user, "2025-06-28T120000-note.md", "# First Note")
-    anga2 = create_anga(@user, "2025-06-29T130000-note.md", "# Second Note")
+    create(:anga, user: @user, filename: "2025-06-28T120000-note.md")
+    create(:anga, user: @user, filename: "2025-06-29T130000-note.md")
 
     get app_everything_path
     assert_response :success
@@ -28,8 +28,8 @@ class EverythingControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index filters angas by search query" do
-    anga1 = create_anga(@user, "2025-06-28T120000-hello.md", "# Hello")
-    anga2 = create_anga(@user, "2025-06-29T130000-world.md", "# World")
+    create(:anga, user: @user, filename: "2025-06-28T120000-hello.md")
+    create(:anga, user: @user, filename: "2025-06-29T130000-world.md")
 
     get app_everything_path, params: { q: "hello" }
     assert_response :success
@@ -44,18 +44,5 @@ class EverythingControllerTest < ActionDispatch::IntegrationTest
   test "root redirects to everything when signed in" do
     get root_path
     assert_redirected_to app_everything_path
-  end
-
-  private
-
-  def create_anga(user, filename, content)
-    anga = user.angas.new(filename: filename)
-    anga.file.attach(
-      io: StringIO.new(content),
-      filename: filename,
-      content_type: Rack::Mime.mime_type(File.extname(filename))
-    )
-    anga.save!
-    anga
   end
 end

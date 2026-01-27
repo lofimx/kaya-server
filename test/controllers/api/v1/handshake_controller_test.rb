@@ -2,7 +2,7 @@ require "test_helper"
 
 class Api::V1::HandshakeControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = users(:one)
+    @user = create(:user)
   end
 
   test "should return 401 without authentication" do

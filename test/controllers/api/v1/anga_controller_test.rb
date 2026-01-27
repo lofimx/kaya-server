@@ -2,7 +2,7 @@ require "test_helper"
 
 class Api::V1::AngaControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = users(:one)
+    @user = create(:user)
   end
 
   test "should return 401 without authentication" do
@@ -11,7 +11,7 @@ class Api::V1::AngaControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should return 403 when accessing another user's anga" do
-    other_user = users(:two)
+    other_user = create(:user)
     get api_v1_user_anga_index_url(user_email: other_user.email_address),
         headers: basic_auth_header(@user.email_address, "password")
     assert_response :forbidden
@@ -26,8 +26,8 @@ class Api::V1::AngaControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index should return list of filenames" do
-    anga1 = create_anga(@user, "2025-06-28T120000-note.md", "# Note")
-    anga2 = create_anga(@user, "2025-06-29T130000-bookmark.url", "[InternetShortcut]\nURL=https://example.com")
+    create(:anga, user: @user, filename: "2025-06-28T120000-note.md")
+    create(:anga, :bookmark, user: @user, filename: "2025-06-29T130000-bookmark.url")
 
     get api_v1_user_anga_index_url(user_email: @user.email_address),
         headers: basic_auth_header(@user.email_address, "password")
@@ -47,7 +47,9 @@ class Api::V1::AngaControllerTest < ActionDispatch::IntegrationTest
 
   test "show should return file content" do
     content = "# My Note\n\nThis is a test note."
-    anga = create_anga(@user, "2025-06-28T120000-test.md", content)
+    anga = @user.angas.new(filename: "2025-06-28T120000-test.md")
+    anga.file.attach(io: StringIO.new(content), filename: "2025-06-28T120000-test.md", content_type: "text/markdown")
+    anga.save!
 
     get api_v1_user_anga_file_url(user_email: @user.email_address, filename: "2025-06-28T120000-test.md"),
         headers: basic_auth_header(@user.email_address, "password")
@@ -63,9 +65,8 @@ class Api::V1::AngaControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create should reject duplicate filename with 409" do
-    create_anga(@user, "2025-06-28T120000-existing.md", "# Existing")
+    create(:anga, user: @user, filename: "2025-06-28T120000-existing.md")
 
-    # Create a temp file with matching name
     file = Tempfile.new([ "2025-06-28T120000-existing", ".md" ])
     file.write("# New content")
     file.rewind
@@ -103,16 +104,5 @@ class Api::V1::AngaControllerTest < ActionDispatch::IntegrationTest
 
   def basic_auth_header(email, password)
     { "Authorization" => ActionController::HttpAuthentication::Basic.encode_credentials(email, password) }
-  end
-
-  def create_anga(user, filename, content)
-    anga = user.angas.new(filename: filename)
-    anga.file.attach(
-      io: StringIO.new(content),
-      filename: filename,
-      content_type: Rack::Mime.mime_type(File.extname(filename))
-    )
-    anga.save!
-    anga
   end
 end

@@ -1,7 +1,7 @@
 require "test_helper"
 
 class AccountsControllerTest < ActionDispatch::IntegrationTest
-  setup { @user = User.take }
+  setup { @user = create(:user) }
 
   test "show requires authentication" do
     get account_path
