@@ -68,12 +68,7 @@ The primary interface to Kaya is its API. The API allows users to authenticate t
 **APIs:**
 
 * GET `/api/v1/handshake` - allows the client to discover this user's namespaced API endpoint
-* POST `/api/v1/:user_email/diff` - the client can send a list of files it knows about as a json document:
-  * the server returns a json document with top-level keys of `baseurl`, `additional`, and `missing`
-  * `additional` points to an array of filenames representing files the server knows about (and has stored) which the client is missing 
-  * `missing` points to an array of filenames the client knows about which the server is missing
-  * `baseurl` points to a user-namespaced API URL, such as `/api/v1/:user_email/anga`
-* GET `/api/v1/:user_email/anga` - returns a `text/plain` mimetype containing a simple, flat list of files with the format mentioned under "Core Concept": `2025-06-28T120000-note-to-self-example.md`
+* GET `/api/v1/:user_email/anga` - returns a `text/plain` mimetype containing a simple, flat list of files with the format mentioned under "Core Concept": `2025-06-28T120000-note-to-self-example.md` so that clients can "diff" their list of files with the server's list of files for a given user
 * GET `/api/v1/:user_email/anga/:filename` - returns the file as though it were accessed directly via Apache or nginx
 * POST `/api/v1/:user_email/anga/:filename` - allows the client to directly POST one file a `multipart/form-data` Content-Type with correct Content-Type (MIME type) set on parts or a `application/octet-stream` Content-Type with raw binary file data and the file's MIME type is derived from the file extension
   * if the filename in the `Content-Disposition` does not match the un-escaped filename in the URL, the POST is rejected with a 417 HTTP error
