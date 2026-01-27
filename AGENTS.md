@@ -1,0 +1,80 @@
+# Kaya Developer Guide for AI Assistants
+
+This document provides guidance for AI assistants working on the Kaya Server codebase. Kaya is a very simple, immutable, local-first-friendly note-taking and bookmarking platform.
+
+The Kaya Server allows users to create accounts, store, and search their notes and bookmarks. Kaya Server allows users to store notes and bookmarks, but users' primary method of interaction is using browser plugins, mobile apps, and desktop apps.
+
+"%Y-%m-%dT%H%M%S"
+
+### Essential Commands
+
+* `rails s` to start the server
+* `rake test` to run unit tests
+* `rake` provides most other commands, as this is a standard Rails project
+* `ngrok http 80` for reverse proxy (mostly not needed)
+
+---
+
+## Codebase Overview
+
+**Backend:**
+
+* Ruby 3.4.8 / Rails 8.1
+* PostgreSQL 17 (with pgcrypto, pg_trgm extensions)
+
+**Frontend:**
+
+* Hotwire (Turbo Rails + Stimulus)
+
+**Key Libraries:**
+
+* File Storage:   ActiveStorage
+* Authentication: Rails 8
+* OAuth 2.0:      OmniAuth
+* Versioning:     Paper Trail 17
+
+---
+
+## Core Concept
+
+The simplicity of Kaya comes from a very simple concept: that notes and bookmarks are just files on disk, each named in a sequential fashion, following a `YYYY-mm-ddTHHMMSS` format, in UTC. These files are _immutable_, meaning that the user records one and then never touches it again. The timestamp associated with the file corresponds to the time (in UTC) the user made the record.
+
+The core functionality of Kaya comes from retrieval: looking up old notes, bookmarks, and files.
+
+---
+
+## Domain Model
+
+### Kāya, the "heap"
+
+"Kāya" means a "heap" or "collection" in Pāli. It refers to each user's timestamped pile of files. To simplify spelling, the program name is simply `Kaya`, without the diacritical mark.
+
+### Aṅga, the "part"
+
+"Aṅga" means "constituent part" or "limb" in Pāli. Every timestamped record in the user's heap is one constituent part. To simplify spelling, the model is simply `Anga`, without the diacritical mark.
+
+**Anga File Types:**
+
+* `.md` - Markdown files are notes
+* `.url` - URL files, in the style of Microsoft Windows, are bookmarks
+* `.*` - any other file types (images, PDFs, etc.) are simply stored as-is
+
+---
+
+## API
+
+The primary interface to Kaya is its API. The API allows users to authenticate their client using the plain email and password associated with their `User` model, using HTTP Basic Authentication. The API is globally versioned, namespaced by the user's email, and all API endpoints are authenticated.
+
+**APIs:**
+
+* GET `/api/v1/handshake` - allows the client to discover this user's namespaced API endpoint
+* POST `/api/v1/:user_email/diff` - the client can send a list of files it knows about as a json document:
+  * the server returns a json document with top-level keys of `baseurl`, `additional`, and `missing`
+  * `additional` points to an array of filenames representing files the server knows about (and has stored) which the client is missing 
+  * `missing` points to an array of filenames the client knows about which the server is missing
+  * `baseurl` points to a user-namespaced API URL, such as `/api/v1/:user_email/anga`
+* GET `/api/v1/:user_email/anga` - returns a `text/plain` mimetype containing a simple, flat list of files with the format mentioned under "Core Concept": `2025-06-28T120000-note-to-self-example.md`
+* GET `/api/v1/:user_email/anga/:filename` - returns the file as though it were accessed directly via Apache or nginx
+* POST `/api/v1/:user_email/anga/:filename` - allows the client to directly POST one file a `multipart/form-data` Content-Type with correct Content-Type (MIME type) set on parts or a `application/octet-stream` Content-Type with raw binary file data and the file's MIME type is derived from the file extension
+  * if the filename in the `Content-Disposition` does not match the un-escaped filename in the URL, the POST is rejected with a 417 HTTP error
+  * if the filename in either the `Content-Disposition` or the URL collides with an existing filename at that same URL, the POST is rejected with a 409 HTTP error
