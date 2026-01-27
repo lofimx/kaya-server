@@ -1,4 +1,16 @@
 Rails.application.routes.draw do
+  # API
+  namespace :api do
+    namespace :v1 do
+      get "handshake", to: "handshake#show"
+      scope ":user_email", constraints: { user_email: /[^\/]+/ } do
+        resources :anga, only: [ :index ], controller: "anga", as: "user_anga"
+        get "anga/:filename", to: "anga#show", as: "user_anga_file", constraints: { filename: /[^\/]+/ }
+        post "anga/:filename", to: "anga#create", constraints: { filename: /[^\/]+/ }
+      end
+    end
+  end
+
   # Authentication
   resource :session
   resource :registration, only: [ :new, :create ]

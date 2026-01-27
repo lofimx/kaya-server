@@ -37,7 +37,7 @@ The Kaya Server allows users to create accounts, store, and search their notes a
 
 ## Core Concept
 
-The simplicity of Kaya comes from a very simple concept: that notes and bookmarks are just files on disk, each named in a sequential fashion, following a `YYYY-mm-ddTHHMMSS` format, in UTC. These files are _immutable_, meaning that the user records one and then never touches it again. The timestamp associated with the file corresponds to the time (in UTC) the user made the record.
+The simplicity of Kaya comes from a very simple concept: that notes and bookmarks are just files on disk, each named in a sequential fashion, following a `YYYY-mm-ddTHHMMSS` format, in UTC. These files are _immutable_, meaning that the user records one and then never touches it again. The timestamp associated with the file corresponds to the time (in UTC) the user made the record. In the rare case when there is a sub-section collision, the filename prefix format is `YYYY-mm-ddTHHMMSS_SSSSSSSSS`, representing nanoseconds.
 
 The core functionality of Kaya comes from retrieval: looking up old notes, bookmarks, and files.
 
@@ -83,3 +83,81 @@ The primary interface to Kaya is its API. The API allows users to authenticate t
 * POST `/api/v1/:user_email/anga/:filename` - allows the client to directly POST one file a `multipart/form-data` Content-Type with correct Content-Type (MIME type) set on parts or a `application/octet-stream` Content-Type with raw binary file data and the file's MIME type is derived from the file extension
   * if the filename in the `Content-Disposition` does not match the un-escaped filename in the URL, the POST is rejected with a 417 HTTP error
   * if the filename in either the `Content-Disposition` or the URL collides with an existing filename at that same URL, the POST is rejected with a 409 HTTP error
+
+---
+
+## Development Workflows
+
+When adding a new feature:
+
+1. Understand the domain - Read related models and tests
+2. Check existing patterns - Look for similar features
+3. Plan data model changes - Migrations follow Rails conventions
+4. Implement in layers:
+  * Models (business logic, validations, state machines)
+  * Jobs (async processing)
+  * Controllers (user input boundary)
+  * Views/Components (UI)
+5. Add stamps - Event tracking for visibility
+6. Write tests - Factories, specs following existing patterns
+7. Update docs - If adding new patterns/conventions:
+  * keep it light
+  * do not add to `doc/arch/adr-*.md` without asking
+8. Never perform git commands
+
+---
+
+## Stimulus Controllers
+
+### Key Principles
+
+1. **Use declarative actions, not imperative event listeners**
+2. **Keep controllers lightweight** (< 7 targets)
+3. **Single responsibility** per controller
+4. **Component controllers** stay in their component
+
+### Declarative Pattern
+
+**BAD - Imperative:**
+
+```javascript
+// Don't do this!
+export default class extends Controller {
+  static targets = ["button", "content"]
+
+  connect() {
+    this.buttonTarget.addEventListener("click", this.toggle.bind(this))
+  }
+
+  toggle() {
+    this.contentTarget.classList.toggle("hidden")
+  }
+}
+```
+
+**GOOD - Declarative:**
+
+```erb
+<!-- Declare in HTML -->
+<div data-controller="toggle">
+  <button data-action="click->toggle#toggle" data-toggle-target="button">
+    Show
+  </button>
+  <div data-toggle-target="content" class="hidden">
+    Hello World!
+  </div>
+</div>
+```
+
+```javascript
+// Controller just responds
+export default class extends Controller {
+  static targets = ["button", "content"]
+
+  toggle() {
+    this.contentTarget.classList.toggle("hidden")
+    this.buttonTarget.textContent =
+      this.contentTarget.classList.contains("hidden") ? "Show" : "Hide"
+  }
+}
+```
