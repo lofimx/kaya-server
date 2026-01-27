@@ -61,6 +61,16 @@ The core functionality of Kaya comes from retrieval: looking up old notes, bookm
 
 ---
 
+## Storage
+
+Each user's list (kaya) of files (anga) is stored in a directory under ActiveStorage, named for that user's email address. These correspond directly to a list of files available from a namespaced API endpoint:
+
+* `/api/v1/:user_email/anga/`
+
+See "API" for more details.
+
+---
+
 ## API
 
 The primary interface to Kaya is its API. The API allows users to authenticate their client using the plain email and password associated with their `User` model, using HTTP Basic Authentication. The API is globally versioned, namespaced by the user's email, and all API endpoints are authenticated.
