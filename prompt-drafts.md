@@ -19,3 +19,9 @@ Why does the textbox lose focus on search at all? Since this is incremental sear
 When searching for "pdf", the PDF file/anga is not returned. Similar to "note" and "bookmark", "pdf", "png", and other filename extensions should normally not be matched... but they should match when the user types exactly "pdf" or ".pdf" (for example).
 
 ## Preview
+
+Clicking on a tile in the search results should open that file. If it's a URL, open a modal overlay which will contain the contents of the webpage (once we cache it), with an option labelled "visit original page" that, when clicked, opens that URL in a new tab/window. If it's a note (.md), show the text of that note in a modal overlay so the user can read and copy it. If it's an image, show the image in a similar modal overlay. If it's a PDF, render the PDF in a modal overlay so the user can scroll through the pages, read, and copy text. Follow the GNOME HIG for the modal overlay, as per AGENTS.md.
+
+### Refactor: Extract FileType model
+
+Extract a `FileType` model which is used to wrap behaviour like `File.extname` and mapping to `preview_type` in index.html.erb. Anywhere in the codebase where `.md`, `.url`, `.pdf` and so on are hard-coded, the associated behaviour should move into the `FileType` model.

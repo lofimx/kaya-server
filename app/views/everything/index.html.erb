@@ -1,6 +1,6 @@
 <% content_for :app_layout, true %>
 
-<div class="everything-container">
+<div class="everything-container" data-controller="preview-modal">
   <div class="search-container">
     <%= form_with url: app_everything_path, method: :get, class: "search-form", data: { controller: "search", turbo_frame: "anga-results" } do |f| %>
       <input type="search"
@@ -17,29 +17,39 @@
   <%= turbo_frame_tag "anga-results" do %>
     <div class="anga-grid">
       <% @angas.each do |anga| %>
-        <div class="anga-tile">
-          <% ext = File.extname(anga.filename).downcase %>
-          <% if ext == ".md" %>
+        <%
+          file_type = FileType.new(anga.filename)
+          original_url = if file_type.bookmark? && anga.file.attached?
+                           anga.file.download.force_encoding('UTF-8')[/URL=(.+)/, 1]&.strip
+                         end
+        %>
+        <div class="anga-tile"
+             data-action="click->preview-modal#open"
+             data-preview-url="<%= app_anga_preview_path(anga) %>"
+             data-preview-filename="<%= anga.filename %>"
+             data-preview-type="<%= file_type.preview_type %>"
+             <%= "data-preview-original-url=#{original_url}" if original_url %>>
+          <% if file_type.note? || file_type.text? %>
             <div class="anga-tile-content anga-tile-note">
               <% if anga.file.attached? %>
                 <div class="note-preview"><%= anga.file.download.force_encoding('UTF-8').truncate(500) %></div>
               <% end %>
             </div>
-          <% elsif ext == ".url" %>
+          <% elsif file_type.bookmark? %>
             <div class="anga-tile-content anga-tile-bookmark">
               <%= render "shared/icons/bookmark_icon" %>
             </div>
-          <% elsif ext.in?(%w[.png .gif .jpg .jpeg .webp .svg .bmp .ico]) %>
+          <% elsif file_type.image? %>
             <div class="anga-tile-content anga-tile-image">
               <%= image_tag url_for(anga.file), alt: anga.filename %>
             </div>
-          <% elsif ext == ".pdf" %>
+          <% elsif file_type.pdf? %>
             <div class="anga-tile-content anga-tile-pdf">
               <%= render "shared/icons/pdf_icon" %>
             </div>
           <% else %>
             <div class="anga-tile-content anga-tile-file">
-              <div class="file-extension"><%= ext.delete('.').upcase %></div>
+              <div class="file-extension"><%= file_type.extension_name.upcase %></div>
             </div>
           <% end %>
           <div class="anga-tile-filename"><%= anga.filename %></div>
@@ -57,4 +67,6 @@
       </div>
     <% end %>
   <% end %>
+
+  <%= render "shared/preview_modal" %>
 </div>

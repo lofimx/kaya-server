@@ -42,6 +42,7 @@ Rails.application.routes.draw do
   scope "/app", as: "app" do
     get "/", to: redirect("/app/everything")
     get "everything", to: "everything#index"
+    get "anga/:id/preview", to: "anga#preview", as: "anga_preview"
   end
 
   # Homepage

@@ -1,0 +1,29 @@
+<div class="preview-modal"
+     data-preview-modal-target="modal"
+     data-action="click->preview-modal#closeOnBackdrop keydown.esc->preview-modal#closeOnEscape"
+     tabindex="-1">
+  <div class="preview-modal-dialog">
+    <header class="preview-modal-header">
+      <h2 class="preview-modal-title" data-preview-modal-target="title"></h2>
+      <div class="preview-modal-actions">
+        <a href="#"
+           target="_blank"
+           rel="noopener noreferrer"
+           class="btn btn-secondary hidden"
+           data-preview-modal-target="visitLink">
+          Visit original page
+        </a>
+        <button type="button"
+                class="preview-modal-close"
+                data-action="click->preview-modal#close"
+                aria-label="Close">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+    <div class="preview-modal-content" data-preview-modal-target="content">
+    </div>
+  </div>
+</div>

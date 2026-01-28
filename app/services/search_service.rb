@@ -31,14 +31,15 @@ class SearchService
   end
 
   def searcher_for(anga)
-    ext = File.extname(anga.filename).downcase
+    file_type = FileType.new(anga.filename)
 
-    case ext
-    when ".md"
+    if file_type.note?
       Search::NoteSearch.new(anga)
-    when ".pdf"
+    elsif file_type.text?
+      Search::TextSearch.new(anga)
+    elsif file_type.pdf?
       Search::PdfSearch.new(anga)
-    when ".url"
+    elsif file_type.bookmark?
       Search::BookmarkSearch.new(anga)
     else
       Search::GenericFileSearch.new(anga)
