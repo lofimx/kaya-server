@@ -7,7 +7,10 @@
 ## TODO
 
 * [x] avatar
-* [ ] sync API
-* [ ] email address verification
+* [x] sync API
+* [x] basic fuzzy search
 * [ ] save a note/bookmark
-* [ ] search
+* [ ] pre-cache bookmarks in /cache
+* [ ] per-user SQLite full-text search?
+* [ ] PDF OCR with tesseract?
+* [ ] email address verification

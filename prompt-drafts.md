@@ -25,3 +25,13 @@ Clicking on a tile in the search results should open that file. If it's a URL, o
 ### Refactor: Extract FileType model
 
 Extract a `FileType` model which is used to wrap behaviour like `File.extname` and mapping to `preview_type` in index.html.erb. Anywhere in the codebase where `.md`, `.url`, `.pdf` and so on are hard-coded, the associated behaviour should move into the `FileType` model.
+
+## Add a Note/Bookmark/File
+
+To the immediate right of the hamburger menu in the header, add a plus icon (use the GNOME icon `plus-large-circle-symbolic.svg` found in /doc/design). Clicking this plus icon should bring up an "Add" modal. The "Add" modal should share the design with the "Preview" modal. The "Add" modal should contain a textbox with "Enter bookmark/note..." as the input placeholder and a "Save" button in the pill style of a modern, standard GNOME app.
+
+**Notes and Bookmarks**: The "Save" operation should differentiate between bookmarks and notes based on whether or not they are prefixed with an HTTP protocol like "http://" or "https://". If so, the text is a bookmark and should be saved as a `.url` file (anga) in ActiveStorage after having leading and trailing whitespace stripped first. If not, the text is just a note and should be saved as a `.md` file (anga) in ActiveStorage.
+
+**Drag & Drop**: The entire "Add" modal should also accept drag and drop events. If text is dropped, it should record a note/bookmark, according to instructions above, named with a `-note.md` or `-bookmark.url` suffix, respectively. If a file is dropped, `.md` files should be recorded as Notes. `.url` files should be recorded as Bookmarks. All other files should be recorded
+
+**Filename Format**: The filename of dropped files should always be preserved, even for Notes and Bookmarks. All files/anga should have their filename prefixed with a datetimestamp according to the "Core Concept" as described in AGENTS.md
