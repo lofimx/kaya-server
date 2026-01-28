@@ -16,4 +16,6 @@ At a medium typing speed, the search box focus seems to "jump" into the middle o
 
 Why does the textbox lose focus on search at all? Since this is incremental search, it should happen in the background as the user types. Instead of attempting to retain cursor position OR default to refocusing at the end of the search box, is it possible to avoid the search box losing focus at all so the user can just type naturally?
 
+When searching for "pdf", the PDF file/anga is not returned. Similar to "note" and "bookmark", "pdf", "png", and other filename extensions should normally not be matched... but they should match when the user types exactly "pdf" or ".pdf" (for example).
+
 ## Preview

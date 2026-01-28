@@ -10,12 +10,24 @@ module Search
     # match on exact queries, not fuzzy matches like "notwithstanding" -> "note".
     COMMON_FILENAME_PATTERNS = %w[note bookmark].freeze
 
+    # File extensions that should only match on exact queries (with or without dot)
+    COMMON_EXTENSIONS = %w[pdf png gif jpg jpeg webp svg bmp ico md url txt].freeze
+
     def initialize(anga)
       @anga = anga
     end
 
     def search(query, threshold: 0.75)
       filename_base = filename_without_timestamp
+      file_extension = File.extname(@anga.filename).delete(".").downcase
+
+      # Check if query is an exact extension search (e.g., "pdf" or ".pdf")
+      if exact_extension_query?(query)
+        ext = query.downcase.strip.delete_prefix(".")
+        if file_extension == ext
+          return SearchResult.new(match?: true, score: 1.0, matched_text: @anga.filename)
+        end
+      end
 
       # Check if query exactly matches a common pattern (user wants all notes/bookmarks)
       if exact_common_pattern_query?(query)
@@ -117,6 +129,11 @@ module Search
 
     def common_filename_pattern?(filename_base)
       COMMON_FILENAME_PATTERNS.include?(filename_base)
+    end
+
+    def exact_extension_query?(query)
+      ext = query.downcase.strip.delete_prefix(".")
+      COMMON_EXTENSIONS.include?(ext)
     end
   end
 end
