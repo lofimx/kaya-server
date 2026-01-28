@@ -1633,10 +1633,13 @@ img {
     background: #fdf6e3;
 }
 
-:root[data-theme="dark"] .anga-tile-bookmark,
+:root[data-theme="dark"] .anga-tile-bookmark {
+    background: #4a4458;
+}
+
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .anga-tile-bookmark {
-        background: #3d3846;
+        background: #4a4458;
     }
 }
 
@@ -1661,10 +1664,13 @@ img {
     background: #fff5f5;
 }
 
-:root[data-theme="dark"] .anga-tile-pdf,
+:root[data-theme="dark"] .anga-tile-pdf {
+    background: #4a4458;
+}
+
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) .anga-tile-pdf {
-        background: #3d3846;
+        background: #4a4458;
     }
 }
 
