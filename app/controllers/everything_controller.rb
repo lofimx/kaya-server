@@ -1,8 +1,8 @@
 class EverythingController < ApplicationController
   def index
     if params[:q].present?
+      # Search results are already ordered by relevance (highest score first)
       @angas = SearchService.new(Current.user, params[:q]).search
-                           .order(filename: :desc)
     else
       @angas = Current.user.angas
                       .includes(:file_attachment)

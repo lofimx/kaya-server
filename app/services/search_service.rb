@@ -11,17 +11,19 @@ class SearchService
     @threshold = threshold
   end
 
+  # Returns an array of angas ordered by relevance score (highest first)
   def search
-    return @user.angas.none if @query.blank?
+    return [] if @query.blank?
 
-    matching_anga_ids = []
+    matches = []
 
     @user.angas.includes(:file_attachment, :file_blob).find_each do |anga|
       result = search_anga(anga)
-      matching_anga_ids << anga.id if result.match?
+      matches << { anga: anga, score: result.score } if result.match?
     end
 
-    @user.angas.where(id: matching_anga_ids)
+    # Sort by score descending (most relevant first)
+    matches.sort_by { |m| -m[:score] }.map { |m| m[:anga] }
   end
 
   private

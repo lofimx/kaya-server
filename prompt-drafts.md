@@ -59,3 +59,7 @@ Write a system test (https://guides.rubyonrails.org/testing.html#system-testing)
 ## Searching Bookmarks
 
 Now that bookmarks are downloaded as full webpages and successfully cached, add full-text search to BookmarkSearch as we had originally planned. It should search the text of the HTML document, similar to how PDFs are searched, but it does not need to load any of the other assets.
+
+## Search Results
+
+Search results should be ordered by relevance in the UI, starting with the most relevant. At the moment, it seems they are ordered based on their regular ("everything") order, even when returned as search results.
