@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_29_015423) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_213445) do
   create_table "active_storage_attachments", id: { type: :string, limit: 36, default: -> { "lower(hex(randomblob(16)))" } }, force: :cascade do |t|
     t.string "blob_id", limit: 36, null: false
     t.datetime "created_at", null: false
@@ -67,6 +67,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_015423) do
     t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
+  create_table "metas", id: { type: :string, limit: 36 }, force: :cascade do |t|
+    t.string "anga_filename", null: false
+    t.string "anga_id", limit: 36
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.boolean "orphan", default: false, null: false
+    t.datetime "updated_at", null: false
+    t.string "user_id", limit: 36, null: false
+    t.index ["anga_id"], name: "index_metas_on_anga_id"
+    t.index ["user_id", "filename"], name: "index_metas_on_user_id_and_filename", unique: true
+    t.index ["user_id"], name: "index_metas_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -90,5 +103,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_015423) do
   add_foreign_key "angas", "users"
   add_foreign_key "bookmarks", "angas"
   add_foreign_key "identities", "users"
+  add_foreign_key "metas", "angas", on_delete: :nullify
+  add_foreign_key "metas", "users"
   add_foreign_key "sessions", "users"
 end

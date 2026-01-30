@@ -39,6 +39,28 @@ class Api::V1::AngaControllerTest < ActionDispatch::IntegrationTest
     assert_includes lines, "2025-06-29T130000-bookmark.url"
   end
 
+  test "index should URL-escape filenames with special characters" do
+    # Create angas with special characters that need URL escaping
+    create(:anga, user: @user, filename: "2025-06-28T120000-note with spaces.md")
+    create(:anga, user: @user, filename: "2025-06-28T120001-special&chars.md")
+    create(:anga, user: @user, filename: "2025-06-28T120002-unicode-日本語.md")
+
+    get api_v1_user_anga_index_url(user_email: @user.email_address),
+        headers: basic_auth_header(@user.email_address, "password")
+    assert_response :success
+    assert_equal "text/plain", response.media_type
+
+    lines = response.body.strip.split("\n")
+
+    # Filenames should be URL-escaped so clients can use them directly in URLs
+    assert_includes lines, "2025-06-28T120000-note%20with%20spaces.md"
+    assert_includes lines, "2025-06-28T120001-special%26chars.md"
+    assert_includes lines, "2025-06-28T120002-unicode-%E6%97%A5%E6%9C%AC%E8%AA%9E.md"
+
+    # Should NOT contain unescaped versions
+    refute_includes lines, "2025-06-28T120000-note with spaces.md"
+  end
+
   test "show should return 404 for non-existent file" do
     get api_v1_user_anga_file_url(user_email: @user.email_address, filename: "2025-06-28T120000-missing.md"),
         headers: basic_auth_header(@user.email_address, "password")

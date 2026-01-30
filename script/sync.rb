@@ -3,6 +3,10 @@
 
 # Kaya Sync Script
 # Synchronizes local ~/.kaya/ directory with the Kaya server API
+#
+# Directory structure:
+#   ~/.kaya/anga/  - bookmarks, notes, PDFs, images, and other files
+#   ~/.kaya/meta/  - human tags and metadata for anga records (TOML files)
 
 require "net/http"
 require "uri"
@@ -10,10 +14,13 @@ require "json"
 require "fileutils"
 require "optparse"
 require "io/console"
+require "securerandom"
 
 class KayaSync
   DEFAULT_URL = "https://kaya.town"
-  LOCAL_DIR = File.expand_path("~/.kaya")
+  KAYA_DIR = File.expand_path("~/.kaya")
+  ANGA_DIR = File.join(KAYA_DIR, "anga")
+  META_DIR = File.join(KAYA_DIR, "meta")
 
   def initialize(options)
     @email = options[:email]
@@ -21,33 +28,22 @@ class KayaSync
     @base_url = options[:url] || DEFAULT_URL
     @verbose = options[:verbose]
 
-    @downloaded = []
-    @uploaded = []
-    @errors = []
+    @stats = {
+      anga: { downloaded: [], uploaded: [], errors: [] },
+      meta: { downloaded: [], uploaded: [], errors: [] }
+    }
   end
 
   def run
     prompt_credentials
-    ensure_local_dir
+    ensure_local_dirs
 
     log "Connecting to #{@base_url}..."
     log "Syncing files for #{@email}"
     log ""
 
-    server_files = fetch_server_files
-    local_files = fetch_local_files
-
-    files_to_download = server_files - local_files
-    files_to_upload = local_files - server_files
-
-    log "Server has #{server_files.size} files"
-    log "Local has #{local_files.size} files"
-    log "To download: #{files_to_download.size}"
-    log "To upload: #{files_to_upload.size}"
-    log ""
-
-    download_files(files_to_download)
-    upload_files(files_to_upload)
+    sync_anga
+    sync_meta
 
     print_summary
   end
@@ -67,61 +63,86 @@ class KayaSync
     end
   end
 
-  def ensure_local_dir
-    FileUtils.mkdir_p(LOCAL_DIR)
+  def ensure_local_dirs
+    FileUtils.mkdir_p(ANGA_DIR)
+    FileUtils.mkdir_p(META_DIR)
   end
 
-  def fetch_server_files
+  # ============================================================================
+  # Anga Sync
+  # ============================================================================
+
+  def sync_anga
+    log "--- Syncing Anga (files) ---"
+
+    server_files = fetch_server_anga_files
+    local_files = fetch_local_anga_files
+
+    files_to_download = server_files - local_files
+    files_to_upload = local_files - server_files
+
+    log "Server has #{server_files.size} anga files"
+    log "Local has #{local_files.size} anga files"
+    log "To download: #{files_to_download.size}"
+    log "To upload: #{files_to_upload.size}"
+    log ""
+
+    download_anga_files(files_to_download)
+    upload_anga_files(files_to_upload)
+  end
+
+  def fetch_server_anga_files
     uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/anga")
 
     response = make_request(:get, uri)
 
     if response.is_a?(Net::HTTPSuccess)
-      response.body.split("\n").map(&:strip).reject(&:empty?)
+      # Server returns URL-encoded filenames, decode them for comparison
+      response.body.split("\n").map { |f| URI.decode_www_form_component(f.strip) }.reject(&:empty?)
     else
-      log_error "Failed to fetch server file list: #{response.code} #{response.message}"
+      log_error "Failed to fetch server anga list: #{response.code} #{response.message}"
       exit 1
     end
   end
 
-  def fetch_local_files
-    return [] unless Dir.exist?(LOCAL_DIR)
+  def fetch_local_anga_files
+    return [] unless Dir.exist?(ANGA_DIR)
 
-    Dir.entries(LOCAL_DIR)
+    Dir.entries(ANGA_DIR)
        .reject { |f| f.start_with?(".") }
-       .select { |f| File.file?(File.join(LOCAL_DIR, f)) }
+       .select { |f| File.file?(File.join(ANGA_DIR, f)) }
   end
 
-  def download_files(files)
+  def download_anga_files(files)
     files.each do |filename|
-      download_file(filename)
+      download_anga_file(filename)
     end
   end
 
-  def download_file(filename)
+  def download_anga_file(filename)
     uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/anga/#{URI.encode_www_form_component(filename)}")
 
     response = make_request(:get, uri)
 
     if response.is_a?(Net::HTTPSuccess)
-      local_path = File.join(LOCAL_DIR, filename)
+      local_path = File.join(ANGA_DIR, filename)
       File.binwrite(local_path, response.body)
-      log "[DOWNLOAD] #{filename}"
-      @downloaded << filename
+      log "[ANGA DOWNLOAD] #{filename}"
+      @stats[:anga][:downloaded] << filename
     else
-      log_error "[DOWNLOAD FAILED] #{filename}: #{response.code} #{response.message}"
-      @errors << { file: filename, operation: :download, error: "#{response.code} #{response.message}" }
+      log_error "[ANGA DOWNLOAD FAILED] #{filename}: #{response.code} #{response.message}"
+      @stats[:anga][:errors] << { file: filename, operation: :download, error: "#{response.code} #{response.message}" }
     end
   end
 
-  def upload_files(files)
+  def upload_anga_files(files)
     files.each do |filename|
-      upload_file(filename)
+      upload_anga_file(filename)
     end
   end
 
-  def upload_file(filename)
-    local_path = File.join(LOCAL_DIR, filename)
+  def upload_anga_file(filename)
+    local_path = File.join(ANGA_DIR, filename)
     uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/anga/#{URI.encode_www_form_component(filename)}")
 
     file_content = File.binread(local_path)
@@ -131,18 +152,123 @@ class KayaSync
 
     case response
     when Net::HTTPCreated, Net::HTTPSuccess
-      log "[UPLOAD] #{filename}"
-      @uploaded << filename
+      log "[ANGA UPLOAD] #{filename}"
+      @stats[:anga][:uploaded] << filename
     when Net::HTTPConflict
-      log "[SKIP] #{filename} (already exists on server)"
+      log "[ANGA SKIP] #{filename} (already exists on server)"
     when Net::HTTPExpectationFailed
-      log_error "[UPLOAD FAILED] #{filename}: Filename mismatch"
-      @errors << { file: filename, operation: :upload, error: "Filename mismatch" }
+      log_error "[ANGA UPLOAD FAILED] #{filename}: Filename mismatch"
+      @stats[:anga][:errors] << { file: filename, operation: :upload, error: "Filename mismatch" }
     else
-      log_error "[UPLOAD FAILED] #{filename}: #{response.code} #{response.message}"
-      @errors << { file: filename, operation: :upload, error: "#{response.code} #{response.message}" }
+      log_error "[ANGA UPLOAD FAILED] #{filename}: #{response.code} #{response.message}"
+      @stats[:anga][:errors] << { file: filename, operation: :upload, error: "#{response.code} #{response.message}" }
     end
   end
+
+  # ============================================================================
+  # Meta Sync
+  # ============================================================================
+
+  def sync_meta
+    log "--- Syncing Meta (tags/metadata) ---"
+
+    server_files = fetch_server_meta_files
+    local_files = fetch_local_meta_files
+
+    files_to_download = server_files - local_files
+    files_to_upload = local_files - server_files
+
+    log "Server has #{server_files.size} meta files"
+    log "Local has #{local_files.size} meta files"
+    log "To download: #{files_to_download.size}"
+    log "To upload: #{files_to_upload.size}"
+    log ""
+
+    download_meta_files(files_to_download)
+    upload_meta_files(files_to_upload)
+  end
+
+  def fetch_server_meta_files
+    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/meta")
+
+    response = make_request(:get, uri)
+
+    if response.is_a?(Net::HTTPSuccess)
+      # Server returns URL-encoded filenames, decode them for comparison
+      response.body.split("\n").map { |f| URI.decode_www_form_component(f.strip) }.reject(&:empty?)
+    else
+      log_error "Failed to fetch server meta list: #{response.code} #{response.message}"
+      exit 1
+    end
+  end
+
+  def fetch_local_meta_files
+    return [] unless Dir.exist?(META_DIR)
+
+    Dir.entries(META_DIR)
+       .reject { |f| f.start_with?(".") }
+       .select { |f| File.file?(File.join(META_DIR, f)) }
+       .select { |f| f.end_with?(".toml") }
+  end
+
+  def download_meta_files(files)
+    files.each do |filename|
+      download_meta_file(filename)
+    end
+  end
+
+  def download_meta_file(filename)
+    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/meta/#{URI.encode_www_form_component(filename)}")
+
+    response = make_request(:get, uri)
+
+    if response.is_a?(Net::HTTPSuccess)
+      local_path = File.join(META_DIR, filename)
+      File.binwrite(local_path, response.body)
+      log "[META DOWNLOAD] #{filename}"
+      @stats[:meta][:downloaded] << filename
+    else
+      log_error "[META DOWNLOAD FAILED] #{filename}: #{response.code} #{response.message}"
+      @stats[:meta][:errors] << { file: filename, operation: :download, error: "#{response.code} #{response.message}" }
+    end
+  end
+
+  def upload_meta_files(files)
+    files.each do |filename|
+      upload_meta_file(filename)
+    end
+  end
+
+  def upload_meta_file(filename)
+    local_path = File.join(META_DIR, filename)
+    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/meta/#{URI.encode_www_form_component(filename)}")
+
+    file_content = File.binread(local_path)
+    content_type = "application/toml"
+
+    response = make_request(:post, uri, file_content, content_type, filename)
+
+    case response
+    when Net::HTTPCreated, Net::HTTPSuccess
+      log "[META UPLOAD] #{filename}"
+      @stats[:meta][:uploaded] << filename
+    when Net::HTTPConflict
+      log "[META SKIP] #{filename} (already exists on server)"
+    when Net::HTTPExpectationFailed
+      log_error "[META UPLOAD FAILED] #{filename}: Filename mismatch"
+      @stats[:meta][:errors] << { file: filename, operation: :upload, error: "Filename mismatch" }
+    when Net::HTTPUnprocessableEntity
+      log_error "[META UPLOAD FAILED] #{filename}: Invalid TOML format"
+      @stats[:meta][:errors] << { file: filename, operation: :upload, error: "Invalid TOML format" }
+    else
+      log_error "[META UPLOAD FAILED] #{filename}: #{response.code} #{response.message}"
+      @stats[:meta][:errors] << { file: filename, operation: :upload, error: "#{response.code} #{response.message}" }
+    end
+  end
+
+  # ============================================================================
+  # Common Methods
+  # ============================================================================
 
   def make_request(method, uri, body = nil, content_type = nil, filename = nil)
     http = Net::HTTP.new(uri.host, uri.port)
@@ -189,6 +315,7 @@ class KayaSync
     when ".url" then "text/plain"
     when ".txt" then "text/plain"
     when ".json" then "application/json"
+    when ".toml" then "application/toml"
     when ".pdf" then "application/pdf"
     when ".png" then "image/png"
     when ".jpg", ".jpeg" then "image/jpeg"
@@ -209,18 +336,32 @@ class KayaSync
   end
 
   def print_summary
+    total_downloaded = @stats[:anga][:downloaded].size + @stats[:meta][:downloaded].size
+    total_uploaded = @stats[:anga][:uploaded].size + @stats[:meta][:uploaded].size
+    total_errors = @stats[:anga][:errors].size + @stats[:meta][:errors].size
+
     log ""
     log "=" * 50
     log "SYNC COMPLETE"
     log "=" * 50
-    log "Downloaded: #{@downloaded.size} files"
-    log "Uploaded:   #{@uploaded.size} files"
-    log "Errors:     #{@errors.size}"
+    log ""
+    log "Anga (files):"
+    log "  Downloaded: #{@stats[:anga][:downloaded].size}"
+    log "  Uploaded:   #{@stats[:anga][:uploaded].size}"
+    log "  Errors:     #{@stats[:anga][:errors].size}"
+    log ""
+    log "Meta (tags/metadata):"
+    log "  Downloaded: #{@stats[:meta][:downloaded].size}"
+    log "  Uploaded:   #{@stats[:meta][:uploaded].size}"
+    log "  Errors:     #{@stats[:meta][:errors].size}"
+    log ""
+    log "Total: #{total_downloaded} downloaded, #{total_uploaded} uploaded, #{total_errors} errors"
 
-    if @errors.any?
+    all_errors = @stats[:anga][:errors] + @stats[:meta][:errors]
+    if all_errors.any?
       log ""
       log "Errors:"
-      @errors.each do |error|
+      all_errors.each do |error|
         log "  - #{error[:operation].upcase} #{error[:file]}: #{error[:error]}"
       end
     end

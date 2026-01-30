@@ -1,4 +1,4 @@
-# ADR 0001: Use Rails 8+ Built-In Authentication
+# ADR 0002: Use Rails 8+ Built-In Authentication
 
 ## Context
 

@@ -2,21 +2,23 @@ module Api
   module V1
     class CacheController < BaseController
       # GET /api/v1/cache
-      # Lists all cached bookmark directories
+      # Lists all cached bookmark directories (URL-escaped for direct use in URLs)
       def index
         bookmarks = current_user.angas
                                 .joins(:bookmark)
                                 .where.not(bookmarks: { cached_at: nil })
                                 .order(filename: :asc)
 
-        # Return list of cache directory names (same as anga filenames)
-        directory_list = bookmarks.pluck(:filename).join("\n")
+        # Return list of cache directory names (same as anga filenames), URL-escaped
+        filenames = bookmarks.pluck(:filename)
+        escaped_filenames = filenames.map { |f| ERB::Util.url_encode(f) }
+        directory_list = escaped_filenames.join("\n")
 
         render plain: directory_list, content_type: "text/plain"
       end
 
       # GET /api/v1/cache/:bookmark
-      # Lists all files in a cached bookmark directory
+      # Lists all files in a cached bookmark directory (URL-escaped for direct use in URLs)
       def show
         anga = current_user.angas.find_by(filename: params[:bookmark])
 
@@ -25,7 +27,9 @@ module Api
           return
         end
 
-        file_list = anga.bookmark.cached_file_list.join("\n")
+        files = anga.bookmark.cached_file_list
+        escaped_files = files.map { |f| ERB::Util.url_encode(f) }
+        file_list = escaped_files.join("\n")
         render plain: file_list, content_type: "text/plain"
       end
 

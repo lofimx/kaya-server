@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
   has_many :identities, dependent: :destroy
   has_many :angas, dependent: :destroy
+  has_many :metas, dependent: :destroy
   has_one_attached :avatar
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }

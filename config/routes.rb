@@ -8,6 +8,11 @@ Rails.application.routes.draw do
         get "anga/:filename", to: "anga#show", as: "user_anga_file", constraints: { filename: /[^\/]+/ }
         post "anga/:filename", to: "anga#create", constraints: { filename: /[^\/]+/ }
 
+        # Meta API for anga metadata (tags, notes)
+        resources :meta, only: [ :index ], controller: "meta", as: "user_meta"
+        get "meta/:filename", to: "meta#show", as: "user_meta_file", constraints: { filename: /[^\/]+/ }
+        post "meta/:filename", to: "meta#create", constraints: { filename: /[^\/]+/ }
+
         # Cache API for bookmark webpage caching
         get "cache", to: "cache#index", as: "cache"
         get "cache/:bookmark", to: "cache#show", as: "cache_bookmark", constraints: { bookmark: /[^\/]+/ }

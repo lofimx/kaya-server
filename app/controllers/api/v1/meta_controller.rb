@@ -1,32 +1,32 @@
 module Api
   module V1
-    class AngaController < BaseController
+    class MetaController < BaseController
       before_action :authorize_user_access
-      before_action :set_anga, only: [ :show ]
+      before_action :set_meta, only: [ :show ]
 
-      # GET /api/v1/:user_email/anga
-      # Returns a text/plain list of files (URL-escaped for direct use in URLs)
+      # GET /api/v1/:user_email/meta
+      # Returns a text/plain list of meta files (URL-escaped for direct use in URLs)
       def index
-        filenames = current_user.angas.order(:filename).pluck(:filename)
+        filenames = current_user.metas.order(:filename).pluck(:filename)
         escaped_filenames = filenames.map { |f| ERB::Util.url_encode(f) }
         render plain: escaped_filenames.join("\n"), content_type: "text/plain"
       end
 
-      # GET /api/v1/:user_email/anga/:filename
-      # Returns the file content
+      # GET /api/v1/:user_email/meta/:filename
+      # Returns the meta file content
       def show
-        if @anga.file.attached?
-          send_data @anga.file.download,
-            filename: @anga.filename,
-            type: @anga.file.content_type,
+        if @meta.file.attached?
+          send_data @meta.file.download,
+            filename: @meta.filename,
+            type: "application/toml",
             disposition: "inline"
         else
           head :not_found
         end
       end
 
-      # POST /api/v1/:user_email/anga/:filename
-      # Uploads a file
+      # POST /api/v1/:user_email/meta/:filename
+      # Uploads a meta file
       def create
         url_filename = CGI.unescape(params[:filename])
 
@@ -45,20 +45,32 @@ module Api
         end
 
         # Check for collision
-        if current_user.angas.exists?(filename: url_filename)
+        if current_user.metas.exists?(filename: url_filename)
           render plain: "File already exists: #{url_filename}",
                  status: :conflict # 409
           return
         end
 
-        # Create the anga record with attached file
-        @anga = current_user.angas.new(filename: url_filename)
-        @anga.file.attach(uploaded_file)
+        # Parse the TOML to extract anga_filename
+        anga_filename = extract_anga_filename(uploaded_file)
+        if anga_filename.nil?
+          render plain: "Invalid TOML: must contain [anga] section with filename key",
+                 status: :unprocessable_entity
+          return
+        end
 
-        if @anga.save
+        # Create the meta record with attached file
+        @meta = current_user.metas.new(
+          filename: url_filename,
+          anga_filename: anga_filename
+        )
+        uploaded_file.rewind
+        @meta.file.attach(uploaded_file)
+
+        if @meta.save
           head :created
         else
-          render plain: @anga.errors.full_messages.join(", "), status: :unprocessable_entity
+          render plain: @meta.errors.full_messages.join(", "), status: :unprocessable_entity
         end
       end
 
@@ -70,8 +82,8 @@ module Api
         end
       end
 
-      def set_anga
-        @anga = current_user.angas.find_by!(filename: CGI.unescape(params[:filename]))
+      def set_meta
+        @meta = current_user.metas.find_by!(filename: CGI.unescape(params[:filename]))
       rescue ActiveRecord::RecordNotFound
         head :not_found
       end
@@ -82,18 +94,30 @@ module Api
         elsif request.content_type == "application/octet-stream" && request.body.present?
           # Handle raw binary upload - create an UploadedFile-like object
           url_filename = CGI.unescape(params[:filename])
-          content_type = Rack::Mime.mime_type(File.extname(url_filename))
 
-          tempfile = Tempfile.new([ "anga", File.extname(url_filename) ])
+          tempfile = Tempfile.new([ "meta", ".toml" ])
           tempfile.binmode
           tempfile.write(request.body.read)
           tempfile.rewind
 
           ActionDispatch::Http::UploadedFile.new(
             filename: url_filename,
-            type: content_type,
+            type: "application/toml",
             tempfile: tempfile
           )
+        end
+      end
+
+      def extract_anga_filename(uploaded_file)
+        content = uploaded_file.read
+        uploaded_file.rewind
+
+        # Simple TOML parsing for the anga.filename field
+        # Look for [anga] section followed by filename = "..."
+        if content =~ /\[anga\].*?filename\s*=\s*"([^"]+)"/m
+          $1
+        else
+          nil
         end
       end
     end

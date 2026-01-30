@@ -2,9 +2,7 @@
 
 This document provides guidance for AI assistants working on the Kaya Server codebase. Kaya is a very simple, immutable, local-first-friendly note-taking and bookmarking platform.
 
-The Kaya Server allows users to create accounts, store, and search their notes and bookmarks. Kaya Server allows users to store notes and bookmarks, but users' primary method of interaction is using browser plugins, mobile apps, and desktop apps.
-
-"%Y-%m-%dT%H%M%S"
+The Kaya Server allows users to create accounts, store, and search their notes and bookmarks. Although Kaya Server allows users to store notes and bookmarks, users' primary method of interaction is using browser plugins, mobile apps, and desktop apps.
 
 ### Essential Commands
 
@@ -40,6 +38,8 @@ The Kaya Server allows users to create accounts, store, and search their notes a
 The simplicity of Kaya comes from a very simple concept: that notes and bookmarks are just files on disk, each named in a sequential fashion, following a `YYYY-mm-ddTHHMMSS` format, in UTC. These files are _immutable_, meaning that the user records one and then never touches it again. The timestamp associated with the file corresponds to the time (in UTC) the user made the record. In the rare case when there is a sub-section collision, the filename prefix format is `YYYY-mm-ddTHHMMSS_SSSSSSSSS`, representing nanoseconds.
 
 The core functionality of Kaya comes from retrieval: looking up old notes, bookmarks, and files.
+
+Anga (notes, bookmarks, and files) use this Core Concept, but it also applies to metadata files and other immutable data within the system. This makes it easy for Kaya clients to use peer-to-peer folder synchronization to stay up to date with one another, without Kaya Server.
 
 ---
 

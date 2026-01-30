@@ -67,3 +67,17 @@ Search results should be ordered by relevance in the UI, starting with the most 
 ### BUG: Mid-filename text not found
 
 In development, I have a file/anga called `2026-01-28T205243-three-button-mooze.png`. However, when I search for "button", it isn't returned. Is this because of the string difference fuzzy search used? If so, swap out Jaro-Winkler for Levenshtein. If it's a bug in the Search models, fix that instead.
+
+## BUG: Index results for API not URL-escaping characters?
+
+Write a test around the `api/v1/:user_email/anga` index route that asserts that an anga/file with spaces (or other characters that need to be escaped in URLs) in it is listed with the escape characters instead of the literal characters. If the test fails, fix it.
+
+Repeat for the `api/v1/:user_email/cache/:bookmark` show route.
+
+## Metadata APIs and update `sync.rb` for new Data Model
+
+Following the Data Model laid out in 
+[@README.md](file:///home/steven/work/gnome/steven/kaya-gnome/README.md)
+for both 'anga' and 'meta', modify the [@sync.rb](file:///home/steven/work/deobald/kaya-server/script/sync.rb) script to synchronize with the correct Anga directory (`~/.kaya/anga/`) on the local computer.
+
+Also create a metadata API (`/api/v1/:user_email/meta` route, similar to the 'anga' routes). Add functionality to the sync script to sync metadata from `~/.kaya/meta/` to and from these metadata API endpoints.
