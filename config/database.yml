@@ -10,10 +10,15 @@ default: &default
   timeout: 5000
 
 development:
-  <<: *default
-  database: storage/development.sqlite3
-  options:
-    journal_mode: DELETE
+  primary:
+    <<: *default
+    database: storage/development.sqlite3
+    options:
+      journal_mode: DELETE
+  queue:
+    <<: *default
+    database: storage/development_queue.sqlite3
+    migrations_paths: db/queue_migrate
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

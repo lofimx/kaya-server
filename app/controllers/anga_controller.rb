@@ -83,7 +83,7 @@ class AngaController < ApplicationController
       end
 
       # Extract URL from the .url file
-      url = @anga.file.download.force_encoding("UTF-8")[/URL=(.+)/, 1]&.strip
+      url = @anga.bookmark_url
       unless url.present?
         render json: { error: "Could not extract URL from bookmark file" }, status: :unprocessable_entity
         return
@@ -225,21 +225,10 @@ class AngaController < ApplicationController
     )
 
     if anga.save
-      # For bookmarks, create a Bookmark record and cache the webpage
-      if type == "bookmark"
-        cache_bookmark(anga, content)
-      end
-
       render json: { success: true, filename: filename }, status: :created
     else
       render json: { error: anga.errors.full_messages.join(", ") }, status: :unprocessable_entity
     end
-  end
-
-  def cache_bookmark(anga, url)
-    bookmark = anga.create_bookmark(url: url)
-    # Cache the webpage asynchronously to avoid blocking the response
-    CacheBookmarkJob.perform_later(bookmark.id)
   end
 
   def generate_filename(original_name)

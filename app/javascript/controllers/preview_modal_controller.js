@@ -49,7 +49,8 @@ export default class extends Controller {
     this.currentSaveMetaUrl = saveMetaUrl;
     this.currentShareUrl = shareUrl;
 
-    this.titleTarget.textContent = filename;
+    // For bookmarks, show the original URL in the title if available
+    this.titleTarget.textContent = originalUrl || filename;
 
     // Show/hide visit link for bookmarks
     if (originalUrl) {

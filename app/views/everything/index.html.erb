@@ -19,9 +19,7 @@
       <% @angas.each do |anga| %>
         <%
           file_type = FileType.new(anga.filename)
-          original_url = if file_type.bookmark? && anga.file.attached?
-                           anga.file.download.force_encoding('UTF-8')[/URL=(.+)/, 1]&.strip
-                         end
+          original_url = anga.bookmark_url if file_type.bookmark?
           cache_url = if file_type.bookmark? && anga.bookmark&.cached?
                         app_anga_cache_file_path(anga, "index.html")
                       end
@@ -71,7 +69,7 @@
               <div class="file-extension"><%= file_type.extension_name.upcase %></div>
             </div>
           <% end %>
-          <div class="anga-tile-filename"><%= anga.filename %></div>
+          <div class="anga-tile-filename"><%= file_type.bookmark? && original_url.present? ? original_url : anga.filename %></div>
         </div>
       <% end %>
     </div>
