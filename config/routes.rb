@@ -48,11 +48,16 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Public share routes (unauthenticated)
+  get "share/:user_id/anga/:filename", to: "shares#show", as: "share_anga", constraints: { filename: /[^\/]+/ }
+
   # App routes (authenticated)
   scope "/app", as: "app" do
     get "/", to: redirect("/app/everything")
     get "everything", to: "everything#index"
     get "anga/:id/preview", to: "anga#preview", as: "anga_preview"
+    get "anga/:id/meta", to: "anga#meta", as: "anga_meta"
+    post "anga/:id/meta", to: "anga#save_meta", as: "anga_save_meta"
     get "anga/:id/cache_status", to: "anga#cache_status", as: "anga_cache_status"
     get "anga/:id/cache/:filename", to: "anga#cache_file", as: "anga_cache_file", constraints: { filename: /[^\/]+/ }
     post "anga", to: "anga#create", as: "anga_create"

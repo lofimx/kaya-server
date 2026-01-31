@@ -81,3 +81,32 @@ Following the Data Model laid out in
 for both 'anga' and 'meta', modify the [@sync.rb](file:///home/steven/work/deobald/kaya-server/script/sync.rb) script to synchronize with the correct Anga directory (`~/.kaya/anga/`) on the local computer.
 
 Also create a metadata API (`/api/v1/:user_email/meta` route, similar to the 'anga' routes). Add functionality to the sync script to sync metadata from `~/.kaya/meta/` to and from these metadata API endpoints.
+
+## Metadata: Tags and Notes
+
+Add a sidebar to the Preview window, similar to that shown in [@example.html](file:///home/steven/Downloads/example-ui/example.html) , but without the option of adding a Title. Add the `toml-rb` gem and use it for reading and writing TOML, as required in the tasks below.
+
+**Do not:**
+
+* Do not include the "Delete Card" option, since Anga records can't be deleted.
+* Do not include the "Focus" option/button
+
+**Do:**
+
+* Include a "Download" option at the bottom of the sidebar. 
+* Add a "Share" button, which will create a URL and copy it to the clipboard, notifying the user. The URL route should be `/share/:user_id/anga/:filename` and should be unauthenticated.
+* Include an "Add To Space" button, but leave it disabled for now.
+* Include the "Hide Sidebar" / "Show Sidebar" button(s)
+* Include the section for Tags. Read this from the newest Meta record (if any exist) linked to the Anga, according to its TOML file attachment.
+* Include the section for Notes. The Notes editor should be a markdown editor. Read this from the newest Meta record (if any exist) linked to the Anga, according to its TOML file attachment.
+* Add "Save" and "Cancel" buttons to the Preview, according to the GNOME HIG.
+  * if the user clicks "cancel", they're returned to the Everything screen
+  * if the user clicks "save", create a new Meta record with the tags (if any) and note (if any) in the appropraite sections of the toml, according to [@adr-0004-metadata.md](file:///home/steven/work/deobald/kaya-server/doc/arch/adr-0004-metadata.md) .
+  * if the user clicks "save" and an existing Meta record exists, still create a new one and a new attached file, with both tags and note. Like Anga, Meta records cannot be mutated.
+* Keep the "X" in the upper-right to dismiss the Preview modal  
+
+All of the above UI should follow the GNOME HIG and GNOME brand guidelines, as per [@README.md](file:///home/steven/work/deobald/kaya-server/doc/design/README.md) but ignore localization/i18n for now.
+
+### Preview: Clean up bookmarks
+
+Bookmark tiles in the Everything view should list the original URL, rather than the `*-bookmark.url` filename. The Preview window should also put the original URL in the titlebar, instead of the `*-bookmark.url` filename. (This is true of any `.url` file/Anga, not just those with `-bookmark` suffixes.) When a new bookmark Anga is created, either manually or by syncing, it should download the favicon for the corresponding webpage so it can be displayed whether the page is cached or not. Pages still only need to be cached if the Anga tile is opened, causing the webpage to be downloaded.

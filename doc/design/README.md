@@ -1,10 +1,10 @@
 # Kaya Design
 
-Kaya borrows all its design principles from the GNOME Human Interface Guidelines.
+Kaya borrows all its design principles from the [GNOME Human Interface Guidelines](https://developer.gnome.org/hig/), as translated to the web.
 
 ## Icons
 
-Symbolic icons are taken from GNOME HIG icons: https://developer.gnome.org/hig/guidelines/ui-icons.html
+Symbolic icons should always use the GNOME HIG icons: https://developer.gnome.org/hig/guidelines/ui-icons.html
 
 All icons used are Creative Commons Zero 1.0 Universal.
 

@@ -58,6 +58,9 @@ gem "pdf-reader"
 gem "http"
 gem "nokogiri"
 
+# TOML parsing for metadata files
+gem "toml-rb"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

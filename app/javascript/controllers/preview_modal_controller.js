@@ -1,11 +1,30 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["modal", "content", "title", "visitLink"];
+  static targets = [
+    "modal",
+    "content",
+    "title",
+    "visitLink",
+    "sidebar",
+    "sidebarToggle",
+    "sidebarToggleLabel",
+    "sidebarContent",
+    "tagsList",
+    "tagInput",
+    "noteEditor",
+    "shareBtn",
+    "downloadLink",
+    "saveBtn",
+  ];
 
   connect() {
     this.pollingInterval = null;
     this.currentTileElement = null;
+    this.currentTags = [];
+    this.originalTags = [];
+    this.originalNote = "";
+    this.sidebarVisible = true;
   }
 
   disconnect() {
@@ -21,8 +40,15 @@ export default class extends Controller {
     const originalUrl = tile.dataset.previewOriginalUrl;
     const cacheUrl = tile.dataset.previewCacheUrl;
     const cacheStatusUrl = tile.dataset.cacheStatusUrl;
+    const metaUrl = tile.dataset.metaUrl;
+    const saveMetaUrl = tile.dataset.saveMetaUrl;
+    const shareUrl = tile.dataset.shareUrl;
 
     this.currentTileElement = tile;
+    this.currentMetaUrl = metaUrl;
+    this.currentSaveMetaUrl = saveMetaUrl;
+    this.currentShareUrl = shareUrl;
+
     this.titleTarget.textContent = filename;
 
     // Show/hide visit link for bookmarks
@@ -33,8 +59,21 @@ export default class extends Controller {
       this.visitLinkTarget.classList.add("hidden");
     }
 
+    // Set up download link
+    if (this.hasDownloadLinkTarget) {
+      this.downloadLinkTarget.href = url;
+      this.downloadLinkTarget.download = filename;
+    }
+
     // Load content based on file type
     this.loadContent(url, fileType, cacheUrl, cacheStatusUrl);
+
+    // Load metadata (tags and note)
+    this.loadMeta();
+
+    // Reset sidebar state
+    this.sidebarVisible = true;
+    this.updateSidebarVisibility();
 
     this.modalTarget.classList.add("active");
     document.body.style.overflow = "hidden";
@@ -49,6 +88,14 @@ export default class extends Controller {
     document.body.style.overflow = "";
     this.contentTarget.innerHTML = "";
     this.currentTileElement = null;
+    this.currentTags = [];
+    this.originalTags = [];
+    this.originalNote = "";
+    this.clearTagsAndNote();
+  }
+
+  cancel() {
+    this.close();
   }
 
   closeOnBackdrop(event) {
@@ -60,6 +107,195 @@ export default class extends Controller {
   closeOnEscape(event) {
     if (event.key === "Escape") {
       this.close();
+    }
+  }
+
+  toggleSidebar() {
+    this.sidebarVisible = !this.sidebarVisible;
+    this.updateSidebarVisibility();
+  }
+
+  updateSidebarVisibility() {
+    if (this.hasSidebarTarget) {
+      if (this.sidebarVisible) {
+        this.sidebarTarget.classList.remove("collapsed");
+        if (this.hasSidebarToggleLabelTarget) {
+          this.sidebarToggleLabelTarget.textContent = "Hide Sidebar";
+        }
+      } else {
+        this.sidebarTarget.classList.add("collapsed");
+        if (this.hasSidebarToggleLabelTarget) {
+          this.sidebarToggleLabelTarget.textContent = "Show Sidebar";
+        }
+      }
+    }
+  }
+
+  // Load metadata from server
+  async loadMeta() {
+    if (!this.currentMetaUrl) return;
+
+    try {
+      const response = await fetch(this.currentMetaUrl);
+      if (response.ok) {
+        const data = await response.json();
+        this.currentTags = data.tags || [];
+        this.originalTags = [...this.currentTags];
+        this.originalNote = data.note || "";
+
+        this.renderTags();
+
+        if (this.hasNoteEditorTarget) {
+          this.noteEditorTarget.value = this.originalNote;
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load metadata:", error);
+    }
+  }
+
+  // Render tags in the UI
+  renderTags() {
+    if (!this.hasTagsListTarget) return;
+
+    this.tagsListTarget.innerHTML = this.currentTags
+      .map(
+        (tag, index) => `
+      <span class="tag" data-index="${index}">
+        <span class="tag-text">${this.escapeHtml(tag)}</span>
+        <button type="button" class="tag-remove" data-action="click->preview-modal#removeTag" data-index="${index}" aria-label="Remove tag">×</button>
+      </span>
+    `,
+      )
+      .join("");
+  }
+
+  // Add a new tag
+  addTag(event) {
+    event.preventDefault();
+
+    if (!this.hasTagInputTarget) return;
+
+    const tagValue = this.tagInputTarget.value.trim();
+    if (tagValue && !this.currentTags.includes(tagValue)) {
+      this.currentTags.push(tagValue);
+      this.renderTags();
+    }
+
+    this.tagInputTarget.value = "";
+    this.tagInputTarget.focus();
+  }
+
+  // Remove a tag
+  removeTag(event) {
+    const index = parseInt(event.currentTarget.dataset.index, 10);
+    if (!isNaN(index) && index >= 0 && index < this.currentTags.length) {
+      this.currentTags.splice(index, 1);
+      this.renderTags();
+    }
+  }
+
+  // Clear tags and note UI
+  clearTagsAndNote() {
+    if (this.hasTagsListTarget) {
+      this.tagsListTarget.innerHTML = "";
+    }
+    if (this.hasTagInputTarget) {
+      this.tagInputTarget.value = "";
+    }
+    if (this.hasNoteEditorTarget) {
+      this.noteEditorTarget.value = "";
+    }
+  }
+
+  // Check if metadata has changed
+  hasMetaChanges() {
+    const currentNote = this.hasNoteEditorTarget
+      ? this.noteEditorTarget.value
+      : "";
+
+    // Check if tags changed
+    if (this.currentTags.length !== this.originalTags.length) return true;
+    for (let i = 0; i < this.currentTags.length; i++) {
+      if (this.currentTags[i] !== this.originalTags[i]) return true;
+    }
+
+    // Check if note changed
+    if (currentNote !== this.originalNote) return true;
+
+    return false;
+  }
+
+  // Save metadata
+  async save() {
+    if (!this.currentSaveMetaUrl) {
+      this.close();
+      return;
+    }
+
+    // Only save if there are changes
+    if (!this.hasMetaChanges()) {
+      this.close();
+      return;
+    }
+
+    const currentNote = this.hasNoteEditorTarget
+      ? this.noteEditorTarget.value
+      : "";
+
+    try {
+      const response = await fetch(this.currentSaveMetaUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]')
+            ?.content,
+        },
+        body: JSON.stringify({
+          tags: this.currentTags,
+          note: currentNote,
+        }),
+      });
+
+      if (response.ok) {
+        this.close();
+      } else {
+        const data = await response.json();
+        alert(data.error || "Failed to save metadata");
+      }
+    } catch (error) {
+      console.error("Failed to save metadata:", error);
+      alert("Failed to save metadata");
+    }
+  }
+
+  // Share functionality - copy URL to clipboard
+  async shareAnga() {
+    if (!this.currentShareUrl) return;
+
+    try {
+      await navigator.clipboard.writeText(this.currentShareUrl);
+
+      // Show feedback
+      if (this.hasShareBtnTarget) {
+        const originalText = this.shareBtnTarget.innerHTML;
+        this.shareBtnTarget.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Copied!
+        `;
+        this.shareBtnTarget.classList.add("success");
+
+        setTimeout(() => {
+          this.shareBtnTarget.innerHTML = originalText;
+          this.shareBtnTarget.classList.remove("success");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Failed to copy share URL:", error);
+      // Fallback: show the URL in an alert
+      alert(`Share URL: ${this.currentShareUrl}`);
     }
   }
 

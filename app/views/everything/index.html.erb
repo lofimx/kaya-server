@@ -36,6 +36,9 @@
              data-preview-filename="<%= anga.filename %>"
              data-preview-type="<%= file_type.preview_type %>"
              data-anga-id="<%= anga.id %>"
+             data-meta-url="<%= app_anga_meta_path(anga) %>"
+             data-save-meta-url="<%= app_anga_save_meta_path(anga) %>"
+             data-share-url="<%= share_anga_url(user_id: Current.user.id, filename: anga.filename) %>"
              <%= "data-preview-original-url=#{original_url}" if original_url %>
              <%= "data-preview-cache-url=#{cache_url}" if cache_url %>
              <%= "data-cache-status-url=#{cache_status_url}" if cache_status_url %>>
