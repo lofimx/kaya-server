@@ -7,6 +7,7 @@
 # Directory structure:
 #   ~/.kaya/anga/  - bookmarks, notes, PDFs, images, and other files
 #   ~/.kaya/meta/  - human tags and metadata for anga records (TOML files)
+#   ~/.kaya/cache/ - cached webpage content for bookmarks (download-only)
 
 require "net/http"
 require "uri"
@@ -21,6 +22,7 @@ class KayaSync
   KAYA_DIR = File.expand_path("~/.kaya")
   ANGA_DIR = File.join(KAYA_DIR, "anga")
   META_DIR = File.join(KAYA_DIR, "meta")
+  CACHE_DIR = File.join(KAYA_DIR, "cache")
 
   def initialize(options)
     @email = options[:email]
@@ -30,7 +32,8 @@ class KayaSync
 
     @stats = {
       anga: { downloaded: [], uploaded: [], errors: [] },
-      meta: { downloaded: [], uploaded: [], errors: [] }
+      meta: { downloaded: [], uploaded: [], errors: [] },
+      cache: { downloaded: [], errors: [] }
     }
   end
 
@@ -44,6 +47,7 @@ class KayaSync
 
     sync_anga
     sync_meta
+    sync_cache
 
     print_summary
   end
@@ -66,6 +70,7 @@ class KayaSync
   def ensure_local_dirs
     FileUtils.mkdir_p(ANGA_DIR)
     FileUtils.mkdir_p(META_DIR)
+    FileUtils.mkdir_p(CACHE_DIR)
   end
 
   # ============================================================================
@@ -267,6 +272,119 @@ class KayaSync
   end
 
   # ============================================================================
+  # Cache Sync (download-only)
+  # ============================================================================
+
+  def sync_cache
+    log "--- Syncing Cache (bookmark webpage cache) ---"
+
+    server_bookmarks = fetch_server_cache_bookmarks
+    local_bookmarks = fetch_local_cache_bookmarks
+
+    bookmarks_to_download = server_bookmarks - local_bookmarks
+
+    log "Server has #{server_bookmarks.size} cached bookmarks"
+    log "Local has #{local_bookmarks.size} cached bookmarks"
+    log "To download: #{bookmarks_to_download.size}"
+    log ""
+
+    # Download missing bookmark directories
+    download_cache_bookmarks(bookmarks_to_download)
+
+    # For existing local bookmarks, sync any missing files
+    sync_existing_cache_bookmarks(local_bookmarks & server_bookmarks)
+  end
+
+  def fetch_server_cache_bookmarks
+    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/cache")
+
+    response = make_request(:get, uri)
+
+    if response.is_a?(Net::HTTPSuccess)
+      response.body.split("\n").map { |f| URI.decode_www_form_component(f.strip) }.reject(&:empty?)
+    else
+      log_error "Failed to fetch server cache list: #{response.code} #{response.message}"
+      exit 1
+    end
+  end
+
+  def fetch_local_cache_bookmarks
+    return [] unless Dir.exist?(CACHE_DIR)
+
+    Dir.entries(CACHE_DIR)
+       .reject { |f| f.start_with?(".") }
+       .select { |f| File.directory?(File.join(CACHE_DIR, f)) }
+  end
+
+  def fetch_server_cache_files(bookmark)
+    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/cache/#{URI.encode_www_form_component(bookmark)}")
+
+    response = make_request(:get, uri)
+
+    if response.is_a?(Net::HTTPSuccess)
+      response.body.split("\n").map { |f| URI.decode_www_form_component(f.strip) }.reject(&:empty?)
+    else
+      log_error "Failed to fetch cache file list for #{bookmark}: #{response.code} #{response.message}"
+      []
+    end
+  end
+
+  def fetch_local_cache_files(bookmark)
+    bookmark_dir = File.join(CACHE_DIR, bookmark)
+    return [] unless Dir.exist?(bookmark_dir)
+
+    Dir.entries(bookmark_dir)
+       .reject { |f| f.start_with?(".") }
+       .select { |f| File.file?(File.join(bookmark_dir, f)) }
+  end
+
+  def download_cache_bookmarks(bookmarks)
+    bookmarks.each do |bookmark|
+      download_cache_bookmark(bookmark)
+    end
+  end
+
+  def download_cache_bookmark(bookmark)
+    bookmark_dir = File.join(CACHE_DIR, bookmark)
+    FileUtils.mkdir_p(bookmark_dir)
+
+    server_files = fetch_server_cache_files(bookmark)
+    server_files.each do |filename|
+      download_cache_file(bookmark, filename)
+    end
+  end
+
+  def sync_existing_cache_bookmarks(bookmarks)
+    bookmarks.each do |bookmark|
+      server_files = fetch_server_cache_files(bookmark)
+      local_files = fetch_local_cache_files(bookmark)
+
+      files_to_download = server_files - local_files
+      files_to_download.each do |filename|
+        download_cache_file(bookmark, filename)
+      end
+    end
+  end
+
+  def download_cache_file(bookmark, filename)
+    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/cache/#{URI.encode_www_form_component(bookmark)}/#{URI.encode_www_form_component(filename)}")
+
+    response = make_request(:get, uri)
+
+    if response.is_a?(Net::HTTPSuccess)
+      bookmark_dir = File.join(CACHE_DIR, bookmark)
+      FileUtils.mkdir_p(bookmark_dir)
+      local_path = File.join(bookmark_dir, filename)
+      File.binwrite(local_path, response.body)
+      log "[CACHE DOWNLOAD] #{bookmark}/#{filename}"
+      @stats[:cache][:downloaded] << "#{bookmark}/#{filename}"
+    else
+      log_error "[CACHE DOWNLOAD FAILED] #{bookmark}/#{filename}: #{response.code} #{response.message}"
+      @stats[:cache][:errors] << { file: "#{bookmark}/#{filename}", operation: :download, error: "#{response.code} #{response.message}" }
+    end
+  end
+
+  # ============================================================================
   # Common Methods
   # ============================================================================
 
@@ -336,9 +454,9 @@ class KayaSync
   end
 
   def print_summary
-    total_downloaded = @stats[:anga][:downloaded].size + @stats[:meta][:downloaded].size
+    total_downloaded = @stats[:anga][:downloaded].size + @stats[:meta][:downloaded].size + @stats[:cache][:downloaded].size
     total_uploaded = @stats[:anga][:uploaded].size + @stats[:meta][:uploaded].size
-    total_errors = @stats[:anga][:errors].size + @stats[:meta][:errors].size
+    total_errors = @stats[:anga][:errors].size + @stats[:meta][:errors].size + @stats[:cache][:errors].size
 
     log ""
     log "=" * 50
@@ -355,9 +473,13 @@ class KayaSync
     log "  Uploaded:   #{@stats[:meta][:uploaded].size}"
     log "  Errors:     #{@stats[:meta][:errors].size}"
     log ""
+    log "Cache (bookmark webpages):"
+    log "  Downloaded: #{@stats[:cache][:downloaded].size}"
+    log "  Errors:     #{@stats[:cache][:errors].size}"
+    log ""
     log "Total: #{total_downloaded} downloaded, #{total_uploaded} uploaded, #{total_errors} errors"
 
-    all_errors = @stats[:anga][:errors] + @stats[:meta][:errors]
+    all_errors = @stats[:anga][:errors] + @stats[:meta][:errors] + @stats[:cache][:errors]
     if all_errors.any?
       log ""
       log "Errors:"
