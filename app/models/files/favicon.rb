@@ -1,43 +1,86 @@
-# Favicon handles validation of favicon image data.
-# Used during bookmark caching to detect and discard broken favicons
-# before they are stored.
+# Favicon handles validation and sanitization of favicon image data.
+# Used during bookmark caching to detect broken favicons and, where
+# possible, convert them to a browser-safe format (PNG).
 #
 # Example usage:
-#   Files::Favicon.valid?(image_data, "image/vnd.microsoft.icon")  # => false
-#   Files::Favicon.valid?(image_data, "image/png")                 # => true
+#   favicon = Files::Favicon.new(image_data, "image/vnd.microsoft.icon")
+#   favicon.valid?        # => true/false
+#   favicon.content       # => sanitized image data (PNG for ICO files)
+#   favicon.content_type  # => sanitized content type
 #
 module Files
   class Favicon
     ICO_CONTENT_TYPES = %w[image/x-icon image/vnd.microsoft.icon].freeze
 
-    # Validates that favicon image data is well-formed and can be rendered by browsers.
-    # ICO files get special validation since ImageMagick is too lenient with them.
-    # Other image formats are validated with MiniMagick.
-    def self.valid?(content, content_type)
-      if ico_content_type?(content_type) || ico_magic_bytes?(content)
-        valid_ico?(content)
+    attr_reader :content, :content_type
+
+    def initialize(content, content_type)
+      @content = content
+      @content_type = content_type
+      sanitize_if_ico
+    end
+
+    def valid?
+      if ico?
+        valid_ico?
       else
-        valid_image_via_magick?(content)
+        valid_image_via_magick?
       end
     rescue StandardError => e
       Rails.logger.warn("🟠 WARN: Favicon validation error: #{e.message}")
       false
     end
 
-    def self.ico_content_type?(content_type)
-      ICO_CONTENT_TYPES.include?(content_type)
+    private
+
+    def ico?
+      ICO_CONTENT_TYPES.include?(@content_type) || ico_magic_bytes?
     end
 
-    def self.ico_magic_bytes?(content)
-      content.bytesize >= 6 && content.getbyte(0) == 0 && content.getbyte(1) == 0 &&
-        content.getbyte(2) == 1 && content.getbyte(3) == 0
+    def ico_magic_bytes?
+      @content.bytesize >= 6 && @content.getbyte(0) == 0 && @content.getbyte(1) == 0 &&
+        @content.getbyte(2) == 1 && @content.getbyte(3) == 0
+    end
+
+    # Attempts to sanitize an ICO file by converting it to PNG via MiniMagick.
+    # If the ICO is valid, the original data is preserved.
+    # If the ICO has structural issues but MiniMagick can still read it,
+    # the image is converted to PNG so browsers can render it.
+    # If conversion fails entirely, the original data is kept and valid? will return false.
+    def sanitize_if_ico
+      return unless ico?
+      return if valid_ico?
+
+      convert_to_png
+    rescue StandardError => e
+      Rails.logger.warn("🟠 WARN: ICO sanitization failed for favicon: #{e.message}")
+    end
+
+    def convert_to_png
+      tempfile = Tempfile.new([ "favicon", ".ico" ])
+      tempfile.binmode
+      tempfile.write(@content)
+      tempfile.close
+
+      image = MiniMagick::Image.open(tempfile.path)
+      return unless image.valid?
+
+      image.format "png"
+      png_data = File.binread(image.path)
+
+      @content = png_data
+      @content_type = "image/png"
+
+      Rails.logger.info("🔵 INFO: Converted broken ICO favicon to PNG (#{png_data.bytesize} bytes)")
+    ensure
+      tempfile&.unlink
     end
 
     # Validates an ICO file by checking that directory entry dimensions match
     # the actual BMP/PNG sub-image dimensions. Browsers enforce this consistency
     # and reject ICO files where they disagree.
-    def self.valid_ico?(content)
-      bytes = content.bytes
+    def valid_ico?
+      bytes = @content.bytes
       return false if bytes.length < 6
 
       num_images = bytes[4] | (bytes[5] << 8)
@@ -55,9 +98,7 @@ module Files
 
         return false if img_offset + img_size > bytes.length
 
-        if img_offset + 8 > bytes.length
-          return false
-        end
+        return false if img_offset + 8 > bytes.length
 
         sub_magic = bytes[img_offset, 4]
         if sub_magic == [ 137, 80, 78, 71 ] # PNG
@@ -84,10 +125,10 @@ module Files
       true
     end
 
-    def self.valid_image_via_magick?(content)
+    def valid_image_via_magick?
       tempfile = Tempfile.new([ "favicon", ".img" ])
       tempfile.binmode
-      tempfile.write(content)
+      tempfile.write(@content)
       tempfile.close
 
       image = MiniMagick::Image.open(tempfile.path)
@@ -95,7 +136,5 @@ module Files
     ensure
       tempfile&.unlink
     end
-
-    private_class_method :ico_content_type?, :ico_magic_bytes?, :valid_ico?, :valid_image_via_magick?
   end
 end

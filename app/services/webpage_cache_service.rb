@@ -151,15 +151,17 @@ class WebpageCacheService
       return
     end
 
-    unless Files::Favicon.valid?(content, content_type)
+    favicon = Files::Favicon.new(content, content_type)
+
+    unless favicon.valid?
       Rails.logger.warn("🟠 WARN: Favicon for #{@url} failed image validation, discarding")
       return
     end
 
     @bookmark.favicon.attach(
-      io: StringIO.new(content),
+      io: StringIO.new(favicon.content),
       filename: "favicon.ico",
-      content_type: content_type
+      content_type: favicon.content_type
     )
   rescue StandardError => e
     Rails.logger.warn("Failed to download favicon for #{@url}: #{e.message}")
