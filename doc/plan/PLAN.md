@@ -11,3 +11,5 @@ Before creating the plan, read these documents:
 * [@AGENTS.md](./AGENTS.md)
 * [doc/design/DESIGN.md](./doc/design/DESIGN.md)
 * [doc/arch/*.md](./doc/arch/)
+
+Then create the plan and ask any clarifying questions you have. After I answer your questions to eliminate ambiguity, adjust the plan accordingly. Ask more clarifying questions, if required, and repeat the process until all your questions are answered.
