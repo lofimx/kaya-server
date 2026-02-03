@@ -491,7 +491,16 @@ export default class extends Controller {
     if (data.favicon_url) {
       const tileContent = tile.querySelector(".anga-tile-content");
       if (tileContent && tileContent.classList.contains("anga-tile-bookmark")) {
-        tileContent.innerHTML = `<img src="${data.favicon_url}" class="bookmark-favicon" alt="Favicon">`;
+        const previousContent = tileContent.innerHTML;
+        const img = document.createElement("img");
+        img.src = data.favicon_url;
+        img.className = "bookmark-favicon";
+        img.alt = "Favicon";
+        img.onerror = () => {
+          tileContent.innerHTML = previousContent;
+        };
+        tileContent.innerHTML = "";
+        tileContent.appendChild(img);
       }
     }
   }

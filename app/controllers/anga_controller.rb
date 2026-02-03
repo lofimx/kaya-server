@@ -76,7 +76,7 @@ class AngaController < ApplicationController
 
     # If no bookmark record exists, try to create one from the .url file
     if bookmark.nil?
-      file_type = FileType.new(@anga.filename)
+      file_type = Files::FileType.new(@anga.filename)
       unless file_type.bookmark? && @anga.file.attached?
         render json: { error: "Not a bookmark" }, status: :unprocessable_entity
         return
@@ -188,7 +188,7 @@ class AngaController < ApplicationController
     filename = generate_filename(original_filename)
 
     anga = Current.user.angas.new(filename: filename)
-    file_type = FileType.new(filename)
+    file_type = Files::FileType.new(filename)
 
     anga.file.attach(
       io: uploaded_file.tempfile,

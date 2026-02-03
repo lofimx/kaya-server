@@ -146,6 +146,16 @@ class WebpageCacheService
 
     content_type = response.content_type&.mime_type || "image/x-icon"
 
+    unless content_type.start_with?("image/")
+      Rails.logger.warn("🟠 WARN: Favicon for #{@url} returned non-image content type: #{content_type}")
+      return
+    end
+
+    unless Files::Favicon.valid?(content, content_type)
+      Rails.logger.warn("🟠 WARN: Favicon for #{@url} failed image validation, discarding")
+      return
+    end
+
     @bookmark.favicon.attach(
       io: StringIO.new(content),
       filename: "favicon.ico",

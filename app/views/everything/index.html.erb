@@ -18,7 +18,7 @@
     <div class="anga-grid">
       <% @angas.each do |anga| %>
         <%
-          file_type = FileType.new(anga.filename)
+          file_type = Files::FileType.new(anga.filename)
           original_url = anga.bookmark_url if file_type.bookmark?
           cache_url = if file_type.bookmark? && anga.bookmark&.cached?
                         app_anga_cache_file_path(anga, "index.html")
@@ -48,8 +48,11 @@
             </div>
           <% elsif file_type.bookmark? %>
             <% if anga.bookmark&.favicon&.attached? %>
-              <div class="anga-tile-content anga-tile-bookmark">
-                <%= image_tag app_anga_cache_file_path(anga, "favicon.ico"), class: "bookmark-favicon", alt: "Favicon" %>
+              <div class="anga-tile-content anga-tile-bookmark" data-controller="favicon-fallback">
+                <%= image_tag app_anga_cache_file_path(anga, "favicon.ico"), class: "bookmark-favicon", alt: "Favicon", data: { action: "error->favicon-fallback#showDefault" } %>
+                <template data-favicon-fallback-target="fallback">
+                  <%= render "shared/icons/bookmark_icon" %>
+                </template>
               </div>
             <% else %>
               <div class="anga-tile-content anga-tile-bookmark">

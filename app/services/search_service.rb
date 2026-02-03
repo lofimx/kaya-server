@@ -33,7 +33,7 @@ class SearchService
   end
 
   def searcher_for(anga)
-    file_type = FileType.new(anga.filename)
+    file_type = Files::FileType.new(anga.filename)
 
     if file_type.note?
       Search::NoteSearch.new(anga)

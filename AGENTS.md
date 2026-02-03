@@ -24,7 +24,7 @@ This file will get large, over time, so only prioritize reading through it if yo
 
 * `sqlite3 --readonly ./storage/development.sqlite3` to query 'development' db
 * `sqlite3 --readonly ./storage/development_queue.sqlite3` to query 'development' ActiveJob queue
-* `rails s` to start the server
+* `rails s -b 0.0.0.0` to start the server; bind to 0.0.0.0 so local network mobile apps can connect
 * `rake test` to run unit tests
 * `rake` provides most other commands, as this is a standard Rails project
 * `ngrok http 80` for reverse proxy (mostly not needed)
@@ -110,7 +110,7 @@ Kaya relies on fat models, service objects, and thin views. Where possible, Java
 
 ### Architecture Documentation
 
-* [`doc/arch/`](doc/arch/) contains Architectural Decision Records
+* [`doc/arch/*.md`](./doc/arch/) contains Architectural Decision Records
 
 ### Testing
 
@@ -141,7 +141,7 @@ Kaya relies on fat models, service objects, and thin views. Where possible, Java
 
 ## Design
 
-* [`doc/design/`](doc/design/) contains example icons, graphics, and design documentation for user interfaces and user experiences
+* [`doc/design/`](./doc/design/) contains example icons, graphics, and design documentation for user interfaces and user experiences
 
 Visual design should follow the [GNOME brand guidelines](https://brand.gnome.org/) for typography and colors.
 
@@ -167,6 +167,17 @@ When adding a new feature:
   * keep it light
   * do not add to `doc/arch/adr-*.md` without asking
 8. Never perform git commands
+
+---
+
+## Coding Style
+
+* Prefer meaningful domain objects in [@models](./app/models) to code in services or controllers
+* Extract behaviour into models
+* Extract shared behaviour into methods within models
+* Avoid magic numbers -- instead, you should either:
+  * create constants (ex. `app/models/search/base_search.rb`) or
+  * create variables (ex. `app/models/files/favicon.rb`)
 
 ---
 

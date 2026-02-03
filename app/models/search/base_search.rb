@@ -12,28 +12,28 @@ module Search
 
     def initialize(anga)
       @anga = anga
-      @file_type = FileType.new(anga.filename)
+      @file_type = Files::FileType.new(anga.filename)
     end
 
     def search(query, threshold: 0.75)
       filename_base = filename_without_timestamp
 
       # Check if query is an exact extension search (e.g., "pdf" or ".pdf")
-      if FileType.exact_extension_query?(query)
-        ext = FileType.normalize_extension_query(query)
+      if Files::FileType.exact_extension_query?(query)
+        ext = Files::FileType.normalize_extension_query(query)
         if @file_type.extension_name == ext
           return SearchResult.new(match?: true, score: 1.0, matched_text: @anga.filename)
         end
       end
 
       # Check if query exactly matches a common pattern (user wants all notes/bookmarks)
-      if FileType.common_pattern_query?(query)
+      if Files::FileType.common_pattern_query?(query)
         if filename_base == query.downcase
           return SearchResult.new(match?: true, score: 1.0, matched_text: @anga.filename)
         end
       else
         # For non-exact queries, only match filename if it's not a common pattern
-        unless FileType.common_filename_pattern?(filename_base)
+        unless Files::FileType.common_filename_pattern?(filename_base)
           filename_result = find_best_match(query, filename_base, threshold)
           if filename_result
             return SearchResult.new(match?: true, score: filename_result.score, matched_text: @anga.filename)

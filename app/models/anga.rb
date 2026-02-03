@@ -17,11 +17,11 @@ class Anga < ApplicationRecord
   }
 
   def bookmark_file?
-    FileType.new(filename).bookmark?
+    Files::FileType.new(filename).bookmark?
   end
 
   def pdf_file?
-    FileType.new(filename).pdf?
+    Files::FileType.new(filename).pdf?
   end
 
   # Returns the original URL for bookmark files
