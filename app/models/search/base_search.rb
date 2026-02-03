@@ -6,6 +6,10 @@ module Search
   class BaseSearch
     SearchResult = Struct.new(:match?, :score, :matched_text, keyword_init: true)
 
+    SUBSTRING_MIN_QUERY_LENGTH = 2
+    SUBSTRING_BASE_SCORE = 0.75
+    SUBSTRING_COVERAGE_BONUS = 0.20
+
     def initialize(anga)
       @anga = anga
       @file_type = FileType.new(anga.filename)
@@ -69,12 +73,13 @@ module Search
     end
 
     def find_best_match(query, content, threshold)
+      query_down = query.downcase
       words = tokenize(content)
       best_score = 0.0
       best_match = nil
 
       words.each do |word|
-        score = jaro_winkler_score(query, word)
+        score = best_score_for(query_down, word)
         if score > best_score
           best_score = score
           best_match = word
@@ -86,7 +91,7 @@ module Search
       if query_word_count > 1
         phrases = extract_phrases(content, query_word_count)
         phrases.each do |phrase|
-          score = jaro_winkler_score(query, phrase)
+          score = best_score_for(query_down, phrase)
           if score > best_score
             best_score = score
             best_match = phrase
@@ -98,6 +103,30 @@ module Search
         SearchResult.new(match?: true, score: best_score, matched_text: best_match)
       else
         nil
+      end
+    end
+
+    # Returns the best score from either Jaro-Winkler or substring matching.
+    def best_score_for(query_down, text)
+      jw = jaro_winkler_score(query_down, text)
+      sub = substring_score(query_down, text.downcase)
+      [ jw, sub ].max
+    end
+
+    # Scores a match based on substring containment.
+    # Returns 0.0 if no containment, otherwise a score scaled by how much
+    # of the word the query covers.
+    def substring_score(query_down, word_down)
+      return 0.0 unless query_down.length >= SUBSTRING_MIN_QUERY_LENGTH
+
+      if word_down.include?(query_down)
+        ratio = query_down.length.to_f / word_down.length
+        SUBSTRING_BASE_SCORE + (SUBSTRING_COVERAGE_BONUS * ratio)
+      elsif query_down.include?(word_down)
+        ratio = word_down.length.to_f / query_down.length
+        SUBSTRING_BASE_SCORE + (SUBSTRING_COVERAGE_BONUS * ratio)
+      else
+        0.0
       end
     end
 

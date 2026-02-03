@@ -1,10 +1,12 @@
 class Anga < ApplicationRecord
   before_create :generate_uuid
   after_create_commit :setup_bookmark, if: :bookmark_file?
+  after_create_commit :setup_pdf_text, if: :pdf_file?
 
   belongs_to :user
   has_one_attached :file
   has_one :bookmark, dependent: :destroy
+  has_one :text, dependent: :destroy
   has_many :metas, dependent: :nullify
 
   validates :filename, presence: true
@@ -16,6 +18,10 @@ class Anga < ApplicationRecord
 
   def bookmark_file?
     FileType.new(filename).bookmark?
+  end
+
+  def pdf_file?
+    FileType.new(filename).pdf?
   end
 
   # Returns the original URL for bookmark files
@@ -42,5 +48,9 @@ class Anga < ApplicationRecord
 
   def setup_bookmark
     SetupBookmarkJob.perform_later(id)
+  end
+
+  def setup_pdf_text
+    ExtractPlaintextPdfJob.perform_later(id)
   end
 end

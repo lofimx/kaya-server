@@ -1,27 +1,15 @@
-require "pdf-reader"
-
 module Search
   class PdfSearch < BaseSearch
     protected
 
     def extract_content
-      return nil unless @anga.file.attached?
+      text = @anga.text
+      return nil unless text&.extracted? && text.file.attached?
 
-      tempfile = Tempfile.new([ "pdf_search", ".pdf" ])
-      begin
-        tempfile.binmode
-        tempfile.write(@anga.file.download)
-        tempfile.rewind
-
-        reader = PDF::Reader.new(tempfile.path)
-        text = reader.pages.map(&:text).join("\n\n")
-        text.presence
-      rescue StandardError
-        nil
-      ensure
-        tempfile.close
-        tempfile.unlink
-      end
+      text.file.download.force_encoding("UTF-8")
+    rescue StandardError => e
+      Rails.logger.warn("PdfSearch: Failed to read extracted text for #{@anga.filename}: #{e.message}")
+      nil
     end
   end
 end

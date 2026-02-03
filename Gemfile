@@ -53,6 +53,8 @@ gem "image_processing", "~> 1.2"
 # Full-text search with fuzzy matching
 gem "amatch"
 gem "pdf-reader"
+gem "ruby-readability", require: "readability"
+gem "reverse_markdown"
 
 # HTTP client for webpage caching
 gem "http"

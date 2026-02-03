@@ -6,5 +6,9 @@ class CacheBookmarkJob < ApplicationJob
     return unless bookmark
 
     WebpageCacheService.new(bookmark).cache
+
+    if bookmark.reload.cached?
+      ExtractPlaintextBookmarkJob.perform_later(bookmark.id)
+    end
   end
 end
