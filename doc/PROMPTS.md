@@ -126,3 +126,7 @@ When a bookmark is created, `CacheBookmarkJob` will use `WebpageCacheService` to
 When a PDF is added to Kaya, enqueue `ExtractPlaintextPdfJob` which will use `pdf-reader` gem to extract the plaintext and store it in a `.txt` file attached to a `Text` model which is in turn linked to the `Anga` model that was created for the PDF.
 
 `PdfSearch` should search the extracted Markdown file attached to the `Text` model to find associated PDFs, instead of parsing the PDF during the search operation.
+
+**Sync:**
+
+Expose the 3 `/api/v1/:user_email/text` routes listed in the ADR.

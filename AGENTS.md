@@ -12,7 +12,7 @@ Read [doc/plan/README.md](./doc/plan/README.md) and follow those instructions fo
 
 ## Prompt History
 
-You can find a chronological list of significant past prompts in [PROMPTS.md](PROMPTS.md). Major prompts are titled with Subheading Level Two (\#\#), sub-prompts are titled with Subheading Level Three (\#\#\#).
+You can find a chronological list of significant past prompts in [@PROMPTS.md](./doc/PROMPTS.md). Major prompts are titled with Subheading Level Two (\#\#), sub-prompts are titled with Subheading Level Three (\#\#\#).
 
 The current major prompt or bugfix will probably also be in this file, uncommitted.
 
