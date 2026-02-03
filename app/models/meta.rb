@@ -3,14 +3,14 @@
 # Table name: metas
 # Database name: primary
 #
-#  id            :string(36)       not null, primary key
+#  id            :uuid             not null, primary key
 #  anga_filename :string           not null
 #  filename      :string           not null
 #  orphan        :boolean          default(FALSE), not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
-#  anga_id       :string(36)
-#  user_id       :string(36)       not null
+#  anga_id       :uuid
+#  user_id       :uuid             not null
 #
 # Indexes
 #
@@ -20,11 +20,10 @@
 #
 # Foreign Keys
 #
-#  anga_id  (anga_id => angas.id) ON DELETE => nullify
-#  user_id  (user_id => users.id)
+#  fk_rails_...  (anga_id => angas.id) ON DELETE => nullify
+#  fk_rails_...  (user_id => users.id)
 #
 class Meta < ApplicationRecord
-  before_create :generate_uuid
   before_save :link_to_anga
 
   belongs_to :user
@@ -55,10 +54,6 @@ class Meta < ApplicationRecord
   end
 
   private
-
-  def generate_uuid
-    self.id ||= SecureRandom.uuid
-  end
 
   # Look up the associated Anga by the anga_filename and link them.
   # If the Anga cannot be found, mark this Meta as orphan.

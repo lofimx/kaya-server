@@ -1,7 +1,7 @@
 class CreateTexts < ActiveRecord::Migration[8.1]
   def change
-    create_table :texts, id: { type: :string, limit: 36 } do |t|
-      t.string :anga_id, limit: 36, null: false
+    create_table :texts, id: :uuid do |t|
+      t.uuid :anga_id, null: false
       t.string :source_type, null: false
       t.datetime :extracted_at
       t.text :extract_error

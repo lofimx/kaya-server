@@ -6,7 +6,8 @@
       "mcp__acp__Write",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:rubygems.org)",
-      "WebFetch(domain:shittycodingagent.ai)"
+      "WebFetch(domain:shittycodingagent.ai)",
+      "WebFetch(domain:)"
     ]
   }
 }

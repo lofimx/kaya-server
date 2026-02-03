@@ -3,12 +3,12 @@
 # Table name: sessions
 # Database name: primary
 #
-#  id         :integer          not null, primary key
+#  id         :uuid             not null, primary key
 #  ip_address :string
 #  user_agent :string
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  user_id    :string(36)       not null
+#  user_id    :uuid             not null
 #
 # Indexes
 #
@@ -16,7 +16,7 @@
 #
 # Foreign Keys
 #
-#  user_id  (user_id => users.id)
+#  fk_rails_...  (user_id => users.id)
 #
 FactoryBot.define do
   factory :session do

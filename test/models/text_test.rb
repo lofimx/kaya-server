@@ -3,13 +3,13 @@
 # Table name: texts
 # Database name: primary
 #
-#  id            :string(36)       not null, primary key
+#  id            :uuid             not null, primary key
 #  extract_error :text
 #  extracted_at  :datetime
 #  source_type   :string           not null
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
-#  anga_id       :string(36)       not null
+#  anga_id       :uuid             not null
 #
 # Indexes
 #
@@ -17,7 +17,7 @@
 #
 # Foreign Keys
 #
-#  anga_id  (anga_id => angas.id)
+#  fk_rails_...  (anga_id => angas.id)
 #
 require "test_helper"
 

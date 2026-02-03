@@ -22,8 +22,9 @@ This file will get large, over time, so only prioritize reading through it if yo
 
 ## Essential Commands
 
-* `sqlite3 --readonly ./storage/development.sqlite3` to query 'development' db
-* `sqlite3 --readonly ./storage/development_queue.sqlite3` to query 'development' ActiveJob queue
+* `psql -d kaya_development` to query 'development' db
+* `psql -d kaya_development_queue` to query 'development' ActiveJob queue
+* `bundle exec annotaterb models` to annotate models with their schema
 * `rails s -b 0.0.0.0` to start the server; bind to 0.0.0.0 so local network mobile apps can connect
 * `rake test` to run unit tests
 * `rake` provides most other commands, as this is a standard Rails project

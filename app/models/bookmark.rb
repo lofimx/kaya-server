@@ -3,13 +3,13 @@
 # Table name: bookmarks
 # Database name: primary
 #
-#  id          :string(36)       not null, primary key
+#  id          :uuid             not null, primary key
 #  cache_error :text
 #  cached_at   :datetime
 #  url         :string
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
-#  anga_id     :string(36)       not null
+#  anga_id     :uuid             not null
 #
 # Indexes
 #
@@ -17,11 +17,9 @@
 #
 # Foreign Keys
 #
-#  anga_id  (anga_id => angas.id)
+#  fk_rails_...  (anga_id => angas.id)
 #
 class Bookmark < ApplicationRecord
-  before_create :generate_uuid
-
   belongs_to :anga
 
   # Main HTML file for the cached page
@@ -64,11 +62,5 @@ class Bookmark < ApplicationRecord
       files << asset.filename.to_s
     end
     files
-  end
-
-  private
-
-  def generate_uuid
-    self.id ||= SecureRandom.uuid
   end
 end

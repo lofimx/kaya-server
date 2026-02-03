@@ -3,7 +3,7 @@
 # Table name: users
 # Database name: primary
 #
-#  id                  :string(36)       not null, primary key
+#  id                  :uuid             not null, primary key
 #  email_address       :string           not null
 #  incidental_password :boolean          default(FALSE), not null
 #  password_digest     :string

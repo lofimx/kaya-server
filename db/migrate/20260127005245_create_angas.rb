@@ -1,9 +1,8 @@
 class CreateAngas < ActiveRecord::Migration[8.1]
   def change
-    create_table :angas, id: false do |t|
-      t.string :id, limit: 36, primary_key: true, null: false
+    create_table :angas, id: :uuid do |t|
       t.string :filename, null: false
-      t.string :user_id, limit: 36, null: false
+      t.uuid :user_id, null: false
 
       t.timestamps
     end

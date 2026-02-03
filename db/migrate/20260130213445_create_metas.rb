@@ -1,11 +1,10 @@
 class CreateMetas < ActiveRecord::Migration[8.1]
   def change
-    create_table :metas, id: false do |t|
-      t.string :id, limit: 36, primary_key: true, null: false
+    create_table :metas, id: :uuid do |t|
       t.string :filename, null: false
       t.string :anga_filename, null: false
-      t.string :user_id, limit: 36, null: false
-      t.string :anga_id, limit: 36
+      t.uuid :user_id, null: false
+      t.uuid :anga_id
       t.boolean :orphan, default: false, null: false
 
       t.timestamps

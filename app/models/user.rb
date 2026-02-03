@@ -3,7 +3,7 @@
 # Table name: users
 # Database name: primary
 #
-#  id                  :string(36)       not null, primary key
+#  id                  :uuid             not null, primary key
 #  email_address       :string           not null
 #  incidental_password :boolean          default(FALSE), not null
 #  password_digest     :string
@@ -15,8 +15,7 @@
 #  index_users_on_email_address  (email_address) UNIQUE
 #
 class User < ApplicationRecord
-  # Generate UUID for new records
-  before_create :generate_uuid
+  has_paper_trail
 
   has_secure_password validations: false
   has_many :sessions, dependent: :destroy
@@ -44,10 +43,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  def generate_uuid
-    self.id ||= SecureRandom.uuid
-  end
 
   # Find or create user from OAuth authentication data
   def self.from_omniauth(auth)

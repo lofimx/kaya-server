@@ -1,7 +1,8 @@
 class CreateUsers < ActiveRecord::Migration[8.1]
   def change
-    create_table :users, id: false do |t|
-      t.string :id, limit: 36, primary_key: true, null: false
+    enable_extension "pgcrypto" unless extension_enabled?("pgcrypto")
+
+    create_table :users, id: :uuid do |t|
       t.string :email_address, null: false
       t.string :password_digest
       t.boolean :incidental_password, default: false, null: false

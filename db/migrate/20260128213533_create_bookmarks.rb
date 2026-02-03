@@ -1,7 +1,7 @@
 class CreateBookmarks < ActiveRecord::Migration[8.1]
   def change
-    create_table :bookmarks, id: { type: :string, limit: 36 } do |t|
-      t.string :anga_id, limit: 36, null: false
+    create_table :bookmarks, id: :uuid do |t|
+      t.uuid :anga_id, null: false
       t.string :url
       t.datetime :cached_at
 
