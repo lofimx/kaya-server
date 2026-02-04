@@ -136,3 +136,9 @@ Expose the 3 `/api/v1/:user_email/text` routes listed in the ADR.
 The term 'text' is too generic and will make searching the codebases difficult. I have updated [@adr-0005-full-text-search.md](./doc/arch/adr-0005-full-text-search.md) to reflect the rename of '/text' in APIs and 'Text' in the code to '/words' and 'Words', respectively.
 
 Perform a full rename throughout the codebase to rename 'Text' to 'Words' according to this ADR. A new schema migration is not necessary; the service has not been deployed to production yet, so you can rename within migrations. Start by reading [@PLAN.md](./doc/plan/PLAN.md).
+
+## Replace 'cache' with 'words' in sync.rb example script
+
+[@sync.rb](file:///home/steven/work/deobald/kaya-server/script/sync.rb) currently syncs 'anga', 'meta', and 'cache'. However, local apps do not require a complete cache of every bookmarked webpage. Instead of syncing `/cache`, sync `/words` using the `/api/v1/:user_email/words` API as per the updated ADR at [@adr-0003-sync.md](file:///home/steven/work/deobald/kaya-server/doc/arch/adr-0003-sync.md)
+
+Follow the instructions in [@PLAN.md](file:///home/steven/work/deobald/kaya-server/doc/plan/PLAN.md).

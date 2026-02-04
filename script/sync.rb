@@ -7,7 +7,7 @@
 # Directory structure:
 #   ~/.kaya/anga/  - bookmarks, notes, PDFs, images, and other files
 #   ~/.kaya/meta/  - human tags and metadata for anga records (TOML files)
-#   ~/.kaya/cache/ - cached webpage content for bookmarks (download-only)
+#   ~/.kaya/words/ - extracted text content for bookmarks (download-only)
 
 require "net/http"
 require "uri"
@@ -22,18 +22,19 @@ class KayaSync
   KAYA_DIR = File.expand_path("~/.kaya")
   ANGA_DIR = File.join(KAYA_DIR, "anga")
   META_DIR = File.join(KAYA_DIR, "meta")
-  CACHE_DIR = File.join(KAYA_DIR, "cache")
+  WORDS_DIR = File.join(KAYA_DIR, "words")
 
   def initialize(options)
     @email = options[:email]
     @password = options[:password]
-    @base_url = options[:url] || DEFAULT_URL
+    @base_url = options[:url]
+    @url_from_options = !options[:url].nil?
     @verbose = options[:verbose]
 
     @stats = {
       anga: { downloaded: [], uploaded: [], errors: [] },
       meta: { downloaded: [], uploaded: [], errors: [] },
-      cache: { downloaded: [], errors: [] }
+      words: { downloaded: [], errors: [] }
     }
   end
 
@@ -47,7 +48,7 @@ class KayaSync
 
     sync_anga
     sync_meta
-    sync_cache
+    sync_words
 
     print_summary
   end
@@ -55,22 +56,42 @@ class KayaSync
   private
 
   def prompt_credentials
-    unless @email
-      print "Email: "
-      @email = $stdin.gets.chomp
+    unless @base_url
+      print "Kaya Server URL [#{DEFAULT_URL}]: "
+      url_input = $stdin.gets.chomp
+      @base_url = url_input.empty? ? DEFAULT_URL : url_input.chomp("/")
     end
 
-    unless @password
-      print "Password: "
-      @password = $stdin.noecho(&:gets).chomp
-      puts
+    print "Email: "
+    @email = $stdin.gets.chomp
+
+    print "Password: "
+    @password = $stdin.noecho(&:gets).chomp
+    puts
+
+    if !@url_from_options
+      puts ""
+      print "Will sync with #{@base_url} as #{@email}. Continue? [Y/n]: "
+      confirm = $stdin.gets.chomp.downcase
+      if confirm == "n"
+        puts ""
+        print "Kaya Server URL [#{@base_url}]: "
+        url_input = $stdin.gets.chomp
+        @base_url = url_input.empty? ? @base_url : url_input.chomp("/")
+        print "Email: "
+        @email = $stdin.gets.chomp
+        print "Password: "
+        @password = $stdin.noecho(&:gets).chomp
+        puts
+      end
+      puts ""
     end
   end
 
   def ensure_local_dirs
     FileUtils.mkdir_p(ANGA_DIR)
     FileUtils.mkdir_p(META_DIR)
-    FileUtils.mkdir_p(CACHE_DIR)
+    FileUtils.mkdir_p(WORDS_DIR)
   end
 
   # ============================================================================
@@ -102,8 +123,7 @@ class KayaSync
     response = make_request(:get, uri)
 
     if response.is_a?(Net::HTTPSuccess)
-      # Server returns URL-encoded filenames, decode them for comparison
-      response.body.split("\n").map { |f| URI.decode_www_form_component(f.strip) }.reject(&:empty?)
+      response.body.split("\n").map(&:strip).reject(&:empty?)
     else
       log_error "Failed to fetch server anga list: #{response.code} #{response.message}"
       exit 1
@@ -199,8 +219,7 @@ class KayaSync
     response = make_request(:get, uri)
 
     if response.is_a?(Net::HTTPSuccess)
-      # Server returns URL-encoded filenames, decode them for comparison
-      response.body.split("\n").map { |f| URI.decode_www_form_component(f.strip) }.reject(&:empty?)
+      response.body.split("\n").map(&:strip).reject(&:empty?)
     else
       log_error "Failed to fetch server meta list: #{response.code} #{response.message}"
       exit 1
@@ -272,115 +291,115 @@ class KayaSync
   end
 
   # ============================================================================
-  # Cache Sync (download-only)
+  # Words Sync (download-only)
   # ============================================================================
 
-  def sync_cache
-    log "--- Syncing Cache (bookmark webpage cache) ---"
+  def sync_words
+    log "--- Syncing Words (extracted text) ---"
 
-    server_bookmarks = fetch_server_cache_bookmarks
-    local_bookmarks = fetch_local_cache_bookmarks
+    server_words = fetch_server_words
+    local_words = fetch_local_words
 
-    bookmarks_to_download = server_bookmarks - local_bookmarks
+    words_to_download = server_words - local_words
 
-    log "Server has #{server_bookmarks.size} cached bookmarks"
-    log "Local has #{local_bookmarks.size} cached bookmarks"
-    log "To download: #{bookmarks_to_download.size}"
+    log "Server has #{server_words.size} words records"
+    log "Local has #{local_words.size} words records"
+    log "To download: #{words_to_download.size}"
     log ""
 
-    # Download missing bookmark directories
-    download_cache_bookmarks(bookmarks_to_download)
+    # Download missing words directories
+    download_words(words_to_download)
 
-    # For existing local bookmarks, sync any missing files
-    sync_existing_cache_bookmarks(local_bookmarks & server_bookmarks)
+    # For existing local words, sync any missing files
+    sync_existing_words(local_words & server_words)
   end
 
-  def fetch_server_cache_bookmarks
-    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/cache")
+  def fetch_server_words
+    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/words")
 
     response = make_request(:get, uri)
 
     if response.is_a?(Net::HTTPSuccess)
-      response.body.split("\n").map { |f| URI.decode_www_form_component(f.strip) }.reject(&:empty?)
+      response.body.split("\n").map(&:strip).reject(&:empty?)
     else
-      log_error "Failed to fetch server cache list: #{response.code} #{response.message}"
+      log_error "Failed to fetch server words list: #{response.code} #{response.message}"
       exit 1
     end
   end
 
-  def fetch_local_cache_bookmarks
-    return [] unless Dir.exist?(CACHE_DIR)
+  def fetch_local_words
+    return [] unless Dir.exist?(WORDS_DIR)
 
-    Dir.entries(CACHE_DIR)
+    Dir.entries(WORDS_DIR)
        .reject { |f| f.start_with?(".") }
-       .select { |f| File.directory?(File.join(CACHE_DIR, f)) }
+       .select { |f| File.directory?(File.join(WORDS_DIR, f)) }
   end
 
-  def fetch_server_cache_files(bookmark)
-    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/cache/#{URI.encode_www_form_component(bookmark)}")
+  def fetch_word_files(anga)
+    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/words/#{URI.encode_www_form_component(anga)}")
 
     response = make_request(:get, uri)
 
     if response.is_a?(Net::HTTPSuccess)
-      response.body.split("\n").map { |f| URI.decode_www_form_component(f.strip) }.reject(&:empty?)
+      response.body.split("\n").map(&:strip).reject(&:empty?)
     else
-      log_error "Failed to fetch cache file list for #{bookmark}: #{response.code} #{response.message}"
+      log_error "Failed to fetch word file list for #{anga}: #{response.code} #{response.message}"
       []
     end
   end
 
-  def fetch_local_cache_files(bookmark)
-    bookmark_dir = File.join(CACHE_DIR, bookmark)
-    return [] unless Dir.exist?(bookmark_dir)
+  def fetch_local_word_files(anga)
+    anga_dir = File.join(WORDS_DIR, anga)
+    return [] unless Dir.exist?(anga_dir)
 
-    Dir.entries(bookmark_dir)
+    Dir.entries(anga_dir)
        .reject { |f| f.start_with?(".") }
-       .select { |f| File.file?(File.join(bookmark_dir, f)) }
+       .select { |f| File.file?(File.join(anga_dir, f)) }
   end
 
-  def download_cache_bookmarks(bookmarks)
-    bookmarks.each do |bookmark|
-      download_cache_bookmark(bookmark)
+  def download_words(words_list)
+    words_list.each do |anga|
+      download_word(anga)
     end
   end
 
-  def download_cache_bookmark(bookmark)
-    bookmark_dir = File.join(CACHE_DIR, bookmark)
-    FileUtils.mkdir_p(bookmark_dir)
+  def download_word(anga)
+    anga_dir = File.join(WORDS_DIR, anga)
+    FileUtils.mkdir_p(anga_dir)
 
-    server_files = fetch_server_cache_files(bookmark)
+    server_files = fetch_word_files(anga)
     server_files.each do |filename|
-      download_cache_file(bookmark, filename)
+      download_word_file(anga, filename)
     end
   end
 
-  def sync_existing_cache_bookmarks(bookmarks)
-    bookmarks.each do |bookmark|
-      server_files = fetch_server_cache_files(bookmark)
-      local_files = fetch_local_cache_files(bookmark)
+  def sync_existing_words(words_list)
+    words_list.each do |anga|
+      server_files = fetch_word_files(anga)
+      local_files = fetch_local_word_files(anga)
 
       files_to_download = server_files - local_files
       files_to_download.each do |filename|
-        download_cache_file(bookmark, filename)
+        download_word_file(anga, filename)
       end
     end
   end
 
-  def download_cache_file(bookmark, filename)
-    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/cache/#{URI.encode_www_form_component(bookmark)}/#{URI.encode_www_form_component(filename)}")
+  def download_word_file(anga, filename)
+    uri = URI("#{@base_url}/api/v1/#{URI.encode_www_form_component(@email)}/words/#{URI.encode_www_form_component(anga)}/#{URI.encode_www_form_component(filename)}")
 
     response = make_request(:get, uri)
 
     if response.is_a?(Net::HTTPSuccess)
-      bookmark_dir = File.join(CACHE_DIR, bookmark)
-      FileUtils.mkdir_p(bookmark_dir)
-      local_path = File.join(bookmark_dir, filename)
+      anga_dir = File.join(WORDS_DIR, anga)
+      FileUtils.mkdir_p(anga_dir)
+      local_path = File.join(anga_dir, filename)
       File.binwrite(local_path, response.body)
-      log "[CACHE DOWNLOAD] #{bookmark}/#{filename}"
-      @stats[:cache][:downloaded] << "#{bookmark}/#{filename}"
+      log "[WORDS DOWNLOAD] #{anga}/#{filename}"
+      @stats[:words][:downloaded] << "#{anga}/#{filename}"
     else
-      log_error "[CACHE DOWNLOAD FAILED] #{bookmark}/#{filename}: #{response.code} #{response.message}"
-      @stats[:cache][:errors] << { file: "#{bookmark}/#{filename}", operation: :download, error: "#{response.code} #{response.message}" }
+      log_error "[WORDS DOWNLOAD FAILED] #{anga}/#{filename}: #{response.code} #{response.message}"
+      @stats[:words][:errors] << { file: "#{anga}/#{filename}", operation: :download, error: "#{response.code} #{response.message}" }
     end
   end
 
@@ -454,9 +473,9 @@ class KayaSync
   end
 
   def print_summary
-    total_downloaded = @stats[:anga][:downloaded].size + @stats[:meta][:downloaded].size + @stats[:cache][:downloaded].size
+    total_downloaded = @stats[:anga][:downloaded].size + @stats[:meta][:downloaded].size + @stats[:words][:downloaded].size
     total_uploaded = @stats[:anga][:uploaded].size + @stats[:meta][:uploaded].size
-    total_errors = @stats[:anga][:errors].size + @stats[:meta][:errors].size + @stats[:cache][:errors].size
+    total_errors = @stats[:anga][:errors].size + @stats[:meta][:errors].size + @stats[:words][:errors].size
 
     log ""
     log "=" * 50
@@ -473,13 +492,13 @@ class KayaSync
     log "  Uploaded:   #{@stats[:meta][:uploaded].size}"
     log "  Errors:     #{@stats[:meta][:errors].size}"
     log ""
-    log "Cache (bookmark webpages):"
-    log "  Downloaded: #{@stats[:cache][:downloaded].size}"
-    log "  Errors:     #{@stats[:cache][:errors].size}"
+    log "Words (extracted text):"
+    log "  Downloaded: #{@stats[:words][:downloaded].size}"
+    log "  Errors:     #{@stats[:words][:errors].size}"
     log ""
     log "Total: #{total_downloaded} downloaded, #{total_uploaded} uploaded, #{total_errors} errors"
 
-    all_errors = @stats[:anga][:errors] + @stats[:meta][:errors] + @stats[:cache][:errors]
+    all_errors = @stats[:anga][:errors] + @stats[:meta][:errors] + @stats[:words][:errors]
     if all_errors.any?
       log ""
       log "Errors:"
