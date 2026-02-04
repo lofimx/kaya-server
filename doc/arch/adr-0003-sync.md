@@ -12,12 +12,17 @@ Kaya Server (this repo) will run as an always-up central service that Kaya can a
 
 Files from clients sync to the server symmetrically. Index routes simply list the files available under them, as though they were directory listings.
 
-**Client Data Model to API Mapping:**
+### Mapping for Client Data Model <=> API Routes:
+
+**Immutable, User-Generated Data**
 
 * `~/.kaya/anga/` <=> `/api/v1/:user_email/anga`
 * `~/.kaya/anga/{filename}` <=> `/api/v1/:user_email/anga/:filename`
 * `~/.kaya/meta/` <=> `/api/v1/:user_email/meta`
 * `~/.kaya/meta/{tomlfile}` <=> `/api/v1/:user_email/meta/:tomlfile`
+
+**Ephemeral, Auto-Generated Data**
+
 * `~/.kaya/words/` <=> `/api/v1/:user_email/words`
 * `~/.kaya/words/{anga}` <=> `/api/v1/:user_email/words/:anga`
 * `~/.kaya/words/{anga}/{filename}` <=> `/api/v1/:user_email/words/:anga/:filename`
