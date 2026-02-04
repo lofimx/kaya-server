@@ -13,10 +13,10 @@ Rails.application.routes.draw do
         get "meta/:filename", to: "meta#show", as: "user_meta_file", constraints: { filename: /[^\/]+/ }
         post "meta/:filename", to: "meta#create", constraints: { filename: /[^\/]+/ }
 
-        # Text API for full-text search plaintext copies
-        get "text", to: "text#index", as: "text"
-        get "text/:anga", to: "text#show", as: "text_anga", constraints: { anga: /[^\/]+/ }
-        get "text/:anga/:filename", to: "text#file", as: "text_file", constraints: { anga: /[^\/]+/, filename: /[^\/]+/ }
+        # Words API for full-text search plaintext copies
+        get "words", to: "words#index", as: "words"
+        get "words/:anga", to: "words#show", as: "words_anga", constraints: { anga: /[^\/]+/ }
+        get "words/:anga/:filename", to: "words#file", as: "words_file", constraints: { anga: /[^\/]+/, filename: /[^\/]+/ }
 
         # Cache API for bookmark webpage caching
         get "cache", to: "cache#index", as: "cache"

@@ -27,7 +27,7 @@ class Search::BookmarkSearchTest < ActiveSupport::TestCase
     assert result.score >= 0.75
   end
 
-  test "returns no match when no text and URL does not match" do
+  test "returns no match when no words and URL does not match" do
     anga = create(:anga, user: @user, filename: "2024-01-01T120000-example.url")
     create(:bookmark, anga: anga, url: "https://example.com")
 
@@ -38,10 +38,10 @@ class Search::BookmarkSearchTest < ActiveSupport::TestCase
     assert_equal 0.0, result.score
   end
 
-  test "returns no match when text extraction is pending and URL does not match" do
+  test "returns no match when words extraction is pending and URL does not match" do
     anga = create(:anga, user: @user, filename: "2024-01-01T120000-example.url")
     create(:bookmark, anga: anga, url: "https://example.com")
-    create(:text, :bookmark, anga: anga) # pending, no file attached
+    create(:words, :bookmark, anga: anga) # pending, no file attached
 
     search = Search::BookmarkSearch.new(anga)
     result = search.search("testing")
@@ -53,8 +53,8 @@ class Search::BookmarkSearchTest < ActiveSupport::TestCase
   test "searches extracted text content" do
     anga = create(:anga, user: @user, filename: "2024-01-01T120000-example.url")
     create(:bookmark, anga: anga, url: "https://example.com")
-    text = create(:text, :bookmark, anga: anga, extracted_at: Time.current)
-    text.file.attach(
+    words = create(:words, :bookmark, anga: anga, extracted_at: Time.current)
+    words.file.attach(
       io: StringIO.new("# Welcome\n\nThis is a testing page with important content."),
       filename: "2024-01-01T120000-example.md",
       content_type: "text/markdown"
@@ -71,8 +71,8 @@ class Search::BookmarkSearchTest < ActiveSupport::TestCase
   test "searches multi-word phrases in extracted text" do
     anga = create(:anga, user: @user, filename: "2024-01-01T120000-example.url")
     create(:bookmark, anga: anga, url: "https://example.com")
-    text = create(:text, :bookmark, anga: anga, extracted_at: Time.current)
-    text.file.attach(
+    words = create(:words, :bookmark, anga: anga, extracted_at: Time.current)
+    words.file.attach(
       io: StringIO.new("The quick brown fox jumps over the lazy dog."),
       filename: "2024-01-01T120000-example.md",
       content_type: "text/markdown"
@@ -88,8 +88,8 @@ class Search::BookmarkSearchTest < ActiveSupport::TestCase
   test "uses fuzzy matching for extracted content" do
     anga = create(:anga, user: @user, filename: "2024-01-01T120000-example.url")
     create(:bookmark, anga: anga, url: "https://example.com")
-    text = create(:text, :bookmark, anga: anga, extracted_at: Time.current)
-    text.file.attach(
+    words = create(:words, :bookmark, anga: anga, extracted_at: Time.current)
+    words.file.attach(
       io: StringIO.new("Documentation for developers"),
       filename: "2024-01-01T120000-example.md",
       content_type: "text/markdown"
@@ -113,10 +113,10 @@ class Search::BookmarkSearchTest < ActiveSupport::TestCase
     assert_equal anga.filename, result.matched_text
   end
 
-  test "returns no match gracefully when text extraction failed" do
+  test "returns no match gracefully when words extraction failed" do
     anga = create(:anga, user: @user, filename: "2024-01-01T120000-example.url")
     create(:bookmark, anga: anga, url: "https://example.com")
-    create(:text, :bookmark, :failed, anga: anga)
+    create(:words, :bookmark, :failed, anga: anga)
 
     search = Search::BookmarkSearch.new(anga)
     result = search.search("anything")

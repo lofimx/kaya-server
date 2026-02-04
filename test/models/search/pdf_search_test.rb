@@ -5,7 +5,7 @@ class Search::PdfSearchTest < ActiveSupport::TestCase
     @user = create(:user)
   end
 
-  test "returns no match when no text record exists" do
+  test "returns no match when no words record exists" do
     anga = create(:anga, :pdf, user: @user, filename: "2024-01-01T120000-document.pdf")
 
     search = Search::PdfSearch.new(anga)
@@ -15,9 +15,9 @@ class Search::PdfSearchTest < ActiveSupport::TestCase
     assert_equal 0.0, result.score
   end
 
-  test "returns no match when text extraction is pending" do
+  test "returns no match when words extraction is pending" do
     anga = create(:anga, :pdf, user: @user, filename: "2024-01-01T120000-document.pdf")
-    create(:text, :pdf, anga: anga) # pending, no file attached
+    create(:words, :pdf, anga: anga) # pending, no file attached
 
     search = Search::PdfSearch.new(anga)
     result = search.search("testing")
@@ -28,8 +28,8 @@ class Search::PdfSearchTest < ActiveSupport::TestCase
 
   test "searches extracted text content" do
     anga = create(:anga, :pdf, user: @user, filename: "2024-01-01T120000-document.pdf")
-    text = create(:text, :pdf, anga: anga, extracted_at: Time.current)
-    text.file.attach(
+    words = create(:words, :pdf, anga: anga, extracted_at: Time.current)
+    words.file.attach(
       io: StringIO.new("This document contains important research findings about climate change."),
       filename: "2024-01-01T120000-document.txt",
       content_type: "text/plain"
@@ -45,8 +45,8 @@ class Search::PdfSearchTest < ActiveSupport::TestCase
 
   test "searches multi-word phrases in extracted text" do
     anga = create(:anga, :pdf, user: @user, filename: "2024-01-01T120000-document.pdf")
-    text = create(:text, :pdf, anga: anga, extracted_at: Time.current)
-    text.file.attach(
+    words = create(:words, :pdf, anga: anga, extracted_at: Time.current)
+    words.file.attach(
       io: StringIO.new("The quick brown fox jumps over the lazy dog."),
       filename: "2024-01-01T120000-document.txt",
       content_type: "text/plain"
@@ -61,8 +61,8 @@ class Search::PdfSearchTest < ActiveSupport::TestCase
 
   test "uses fuzzy matching for extracted content" do
     anga = create(:anga, :pdf, user: @user, filename: "2024-01-01T120000-document.pdf")
-    text = create(:text, :pdf, anga: anga, extracted_at: Time.current)
-    text.file.attach(
+    words = create(:words, :pdf, anga: anga, extracted_at: Time.current)
+    words.file.attach(
       io: StringIO.new("Documentation for developers"),
       filename: "2024-01-01T120000-document.txt",
       content_type: "text/plain"
@@ -85,9 +85,9 @@ class Search::PdfSearchTest < ActiveSupport::TestCase
     assert_equal anga.filename, result.matched_text
   end
 
-  test "returns no match gracefully when text extraction failed" do
+  test "returns no match gracefully when words extraction failed" do
     anga = create(:anga, :pdf, user: @user, filename: "2024-01-01T120000-document.pdf")
-    create(:text, :pdf, :failed, anga: anga)
+    create(:words, :pdf, :failed, anga: anga)
 
     search = Search::PdfSearch.new(anga)
     result = search.search("anything")

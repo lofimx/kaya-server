@@ -10,10 +10,10 @@ module Search
         parts << @anga.bookmark.url
       end
 
-      # Include extracted plaintext from the Text model
-      text = @anga.text
-      if text&.extracted? && text.file.attached?
-        parts << text.file.download.force_encoding("UTF-8")
+      # Include extracted plaintext from the Words model
+      words = @anga.words
+      if words&.extracted? && words.file.attached?
+        parts << words.file.download.force_encoding("UTF-8")
       end
 
       parts.join("\n").presence

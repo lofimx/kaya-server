@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: texts
+# Table name: words
 # Database name: primary
 #
 #  id            :uuid             not null, primary key
@@ -13,14 +13,14 @@
 #
 # Indexes
 #
-#  index_texts_on_anga_id  (anga_id) UNIQUE
+#  index_words_on_anga_id  (anga_id) UNIQUE
 #
 # Foreign Keys
 #
 #  fk_rails_...  (anga_id => angas.id)
 #
 FactoryBot.define do
-  factory :text do
+  factory :words do
     anga
     source_type { "bookmark" }
 
@@ -35,12 +35,12 @@ FactoryBot.define do
     trait :extracted do
       extracted_at { Time.current }
 
-      after(:create) do |text|
-        content = text.source_type == "bookmark" ? "# Extracted Content\n\nSample extracted text." : "Extracted PDF text content."
-        filename = text.source_type == "bookmark" ? "#{File.basename(text.anga.filename, '.*')}.md" : "#{File.basename(text.anga.filename, '.*')}.txt"
-        content_type = text.source_type == "bookmark" ? "text/markdown" : "text/plain"
+      after(:create) do |words|
+        content = words.source_type == "bookmark" ? "# Extracted Content\n\nSample extracted text." : "Extracted PDF text content."
+        filename = words.source_type == "bookmark" ? "#{File.basename(words.anga.filename, '.*')}.md" : "#{File.basename(words.anga.filename, '.*')}.txt"
+        content_type = words.source_type == "bookmark" ? "text/markdown" : "text/plain"
 
-        text.file.attach(
+        words.file.attach(
           io: StringIO.new(content),
           filename: filename,
           content_type: content_type

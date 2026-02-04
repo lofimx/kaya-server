@@ -130,3 +130,9 @@ When a PDF is added to Kaya, enqueue `ExtractPlaintextPdfJob` which will use `pd
 **Sync:**
 
 Expose the 3 `/api/v1/:user_email/text` routes listed in the ADR.
+
+## Rename 'Text' to 'Words'
+
+The term 'text' is too generic and will make searching the codebases difficult. I have updated [@adr-0005-full-text-search.md](./doc/arch/adr-0005-full-text-search.md) to reflect the rename of '/text' in APIs and 'Text' in the code to '/words' and 'Words', respectively.
+
+Perform a full rename throughout the codebase to rename 'Text' to 'Words' according to this ADR. A new schema migration is not necessary; the service has not been deployed to production yet, so you can rename within migrations. Start by reading [@PLAN.md](./doc/plan/PLAN.md).

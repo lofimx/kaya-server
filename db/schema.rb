@@ -94,16 +94,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_03_202748) do
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
-  create_table "texts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "anga_id", null: false
-    t.datetime "created_at", null: false
-    t.text "extract_error"
-    t.datetime "extracted_at"
-    t.string "source_type", null: false
-    t.datetime "updated_at", null: false
-    t.index ["anga_id"], name: "index_texts_on_anga_id", unique: true
-  end
-
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email_address", null: false
@@ -124,6 +114,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_03_202748) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  create_table "words", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "anga_id", null: false
+    t.datetime "created_at", null: false
+    t.text "extract_error"
+    t.datetime "extracted_at"
+    t.string "source_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["anga_id"], name: "index_words_on_anga_id", unique: true
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "angas", "users"
@@ -132,5 +132,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_03_202748) do
   add_foreign_key "metas", "angas", on_delete: :nullify
   add_foreign_key "metas", "users"
   add_foreign_key "sessions", "users"
-  add_foreign_key "texts", "angas"
+  add_foreign_key "words", "angas"
 end

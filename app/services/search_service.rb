@@ -17,7 +17,7 @@ class SearchService
 
     matches = []
 
-    @user.angas.includes(:file_attachment, :file_blob, :text, :bookmark).find_each do |anga|
+    @user.angas.includes(:file_attachment, :file_blob, :words, :bookmark).find_each do |anga|
       result = search_anga(anga)
       matches << { anga: anga, score: result.score } if result.match?
     end

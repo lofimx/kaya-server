@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: texts
+# Table name: words
 # Database name: primary
 #
 #  id            :uuid             not null, primary key
@@ -13,13 +13,13 @@
 #
 # Indexes
 #
-#  index_texts_on_anga_id  (anga_id) UNIQUE
+#  index_words_on_anga_id  (anga_id) UNIQUE
 #
 # Foreign Keys
 #
 #  fk_rails_...  (anga_id => angas.id)
 #
-class Text < ApplicationRecord
+class Words < ApplicationRecord
   belongs_to :anga
 
   has_one_attached :file
@@ -38,10 +38,10 @@ class Text < ApplicationRecord
     !extracted? && !extract_failed?
   end
 
-  # Returns the text filename for the API
+  # Returns the words filename for the API
   # Bookmarks: {anga_filename}.md
   # PDFs: {anga_filename}.txt
-  def text_filename
+  def words_filename
     base = anga.filename
     case source_type
     when "bookmark"

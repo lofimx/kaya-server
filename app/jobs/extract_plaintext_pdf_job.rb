@@ -8,7 +8,7 @@ class ExtractPlaintextPdfJob < ApplicationJob
     return unless anga
     return unless anga.file.attached?
 
-    text = anga.text || anga.build_text(source_type: "pdf")
+    words = anga.words || anga.build_words(source_type: "pdf")
 
     begin
       tempfile = Tempfile.new([ "pdf_extract", ".pdf" ])
@@ -21,22 +21,22 @@ class ExtractPlaintextPdfJob < ApplicationJob
 
       if plaintext.blank?
         Rails.logger.warn "🟠 WARN: ExtractPlaintextPdfJob: No text content extracted from #{anga.filename}"
-        text.update!(extract_error: "No text content extracted")
+        words.update!(extract_error: "No text content extracted")
         return
       end
 
       filename = "#{File.basename(anga.filename, '.*')}.txt"
-      text.file.attach(
+      words.file.attach(
         io: StringIO.new(plaintext),
         filename: filename,
         content_type: "text/plain"
       )
-      text.update!(extracted_at: Time.current, extract_error: nil)
+      words.update!(extracted_at: Time.current, extract_error: nil)
 
       Rails.logger.info "🔵 INFO: ExtractPlaintextPdfJob: Extracted plaintext for #{anga.filename}"
     rescue => e
       Rails.logger.error "🔴 ERROR: ExtractPlaintextPdfJob: Failed to extract plaintext for #{anga.filename}: #{e.message}"
-      text.update!(extract_error: "#{e.class}: #{e.message}")
+      words.update!(extract_error: "#{e.class}: #{e.message}")
     ensure
       if tempfile
         tempfile.close

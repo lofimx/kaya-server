@@ -6,28 +6,28 @@ Because Kaya aims to be local-first, local search needs to be possible on edge d
 
 ## Decision
 
-Kaya Server will keep a plaintext copy of bookmarks, PDFs, and other anga which are difficult to search directly. On clients, these plaintext copies will be stored in `~/.kaya/text/` according to the following layout:
+Kaya Server will keep a plaintext copy of bookmarks, PDFs, and other anga which are difficult to search directly. On clients, these plaintext copies will be stored in `~/.kaya/words/` according to the following layout:
 
-* `~/.kaya/text/` = root
-* `~/.kaya/text/{bookmark}` = bookmark root
-* `~/.kaya/text/{bookmark}/{filename}` = plaintext bookmark contents
-* `~/.kaya/text/{pdf}` = pdf root
-* `~/.kaya/text/{pdf}/{filename}` = plaintext pdf contents
+* `~/.kaya/words/` = root
+* `~/.kaya/words/{bookmark}` = bookmark root
+* `~/.kaya/words/{bookmark}/{filename}` = plaintext bookmark contents
+* `~/.kaya/words/{pdf}` = pdf root
+* `~/.kaya/words/{pdf}/{filename}` = plaintext pdf contents
 * etc.
 
 These three patterns are symmetrical to the 3 routes Kaya Server must expose:
 
-* `/api/v1/:user_email/text`
-* `/api/v1/:user_email/text/:anga`
-* `/api/v1/:user_email/text/:anga/:filename`
+* `/api/v1/:user_email/words`
+* `/api/v1/:user_email/words/:anga`
+* `/api/v1/:user_email/words/:anga/:filename`
 
 When the user creates a new anga, whether directly through Kaya Server or indirectly via sync, Kaya Server enqueues a background job to transform it into a plaintext copy.
 
 **API Mapping:**
 
-* `~/.kaya/text/` <=> `/api/v1/:user_email/text`
-* `~/.kaya/text/{anga}` <=> `/api/v1/:user_email/text/:anga`
-* `~/.kaya/text/{anga}/{filename}` <=> `/api/v1/:user_email/text/:anga/:filename`
+* `~/.kaya/words/` <=> `/api/v1/:user_email/words`
+* `~/.kaya/words/{anga}` <=> `/api/v1/:user_email/words/:anga`
+* `~/.kaya/words/{anga}/{filename}` <=> `/api/v1/:user_email/words/:anga/:filename`
 
 ## Status
 

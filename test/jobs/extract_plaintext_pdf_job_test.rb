@@ -22,7 +22,7 @@ class ExtractPlaintextPdfJobTest < ActiveJob::TestCase
     ExtractPlaintextPdfJob.perform_now(anga.id)
 
     anga_reloaded = Anga.find(anga.id)
-    assert_nil anga_reloaded.text
+    assert_nil anga_reloaded.words
   end
 
   test "records error for invalid PDF data" do
@@ -32,23 +32,23 @@ class ExtractPlaintextPdfJobTest < ActiveJob::TestCase
     ExtractPlaintextPdfJob.perform_now(anga.id)
 
     anga.reload
-    assert anga.text.present?
-    assert_not anga.text.extracted?
-    assert anga.text.extract_error.present?
+    assert anga.words.present?
+    assert_not anga.words.extracted?
+    assert anga.words.extract_error.present?
   end
 
-  test "updates existing text record on re-extraction" do
+  test "updates existing words record on re-extraction" do
     user = create(:user)
     anga = create(:anga, :pdf, user: user, filename: "2024-01-01T120000-retry.pdf")
 
-    # Create an existing failed text record
-    anga.create_text!(source_type: "pdf", extract_error: "Previous failure")
+    # Create an existing failed words record
+    anga.create_words!(source_type: "pdf", extract_error: "Previous failure")
 
     ExtractPlaintextPdfJob.perform_now(anga.id)
 
     anga.reload
-    assert anga.text.present?
+    assert anga.words.present?
     # The fake PDF data in the factory will fail, so it should still have an error
-    assert anga.text.extract_error.present?
+    assert anga.words.extract_error.present?
   end
 end

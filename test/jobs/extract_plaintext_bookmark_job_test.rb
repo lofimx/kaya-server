@@ -14,13 +14,13 @@ class ExtractPlaintextBookmarkJobTest < ActiveJob::TestCase
     ExtractPlaintextBookmarkJob.perform_now(bookmark.id)
 
     anga.reload
-    assert anga.text.present?
-    assert anga.text.extracted?
-    assert_equal "bookmark", anga.text.source_type
-    assert anga.text.file.attached?
-    assert_equal "2024-01-01T120000-example.md", anga.text.text_filename
+    assert anga.words.present?
+    assert anga.words.extracted?
+    assert_equal "bookmark", anga.words.source_type
+    assert anga.words.file.attached?
+    assert_equal "2024-01-01T120000-example.md", anga.words.words_filename
 
-    content = anga.text.file.download
+    content = anga.words.file.download
     assert content.present?
   end
 
@@ -38,7 +38,7 @@ class ExtractPlaintextBookmarkJobTest < ActiveJob::TestCase
     ExtractPlaintextBookmarkJob.perform_now(anga.bookmark.id)
 
     anga.reload
-    assert_nil anga.text
+    assert_nil anga.words
   end
 
   test "records error on extraction failure" do
@@ -55,18 +55,18 @@ class ExtractPlaintextBookmarkJobTest < ActiveJob::TestCase
     ExtractPlaintextBookmarkJob.perform_now(bookmark.id)
 
     anga.reload
-    assert anga.text.present?
-    assert_not anga.text.extracted?
-    assert anga.text.extract_error.present?
+    assert anga.words.present?
+    assert_not anga.words.extracted?
+    assert anga.words.extract_error.present?
   end
 
-  test "updates existing text record on re-extraction" do
+  test "updates existing words record on re-extraction" do
     user = create(:user)
     anga = create(:anga, :bookmark, user: user, filename: "2024-01-01T120000-retry.url")
     bookmark = create(:bookmark, anga: anga, url: "https://example.com", cached_at: Time.current)
 
-    # Create an existing failed text record
-    anga.create_text!(source_type: "bookmark", extract_error: "Previous failure")
+    # Create an existing failed words record
+    anga.create_words!(source_type: "bookmark", extract_error: "Previous failure")
 
     bookmark.html_file.attach(
       io: StringIO.new("<html><body><p>Retried content that should now work properly.</p></body></html>"),
@@ -77,7 +77,7 @@ class ExtractPlaintextBookmarkJobTest < ActiveJob::TestCase
     ExtractPlaintextBookmarkJob.perform_now(bookmark.id)
 
     anga.reload
-    assert anga.text.extracted?
-    assert_nil anga.text.extract_error
+    assert anga.words.extracted?
+    assert_nil anga.words.extract_error
   end
 end

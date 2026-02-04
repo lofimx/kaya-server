@@ -3,12 +3,12 @@ module Search
     protected
 
     def extract_content
-      text = @anga.text
-      return nil unless text&.extracted? && text.file.attached?
+      words = @anga.words
+      return nil unless words&.extracted? && words.file.attached?
 
-      text.file.download.force_encoding("UTF-8")
+      words.file.download.force_encoding("UTF-8")
     rescue StandardError => e
-      Rails.logger.warn("PdfSearch: Failed to read extracted text for #{@anga.filename}: #{e.message}")
+      Rails.logger.warn("PdfSearch: Failed to read extracted words for #{@anga.filename}: #{e.message}")
       nil
     end
   end
