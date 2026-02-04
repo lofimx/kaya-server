@@ -1684,6 +1684,7 @@ img {
 .anga-tile-pdf svg {
     width: 64px;
     height: 64px;
+    color: var(--color-primary);
 }
 
 /* Generic File Tiles */
