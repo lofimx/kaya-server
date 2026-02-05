@@ -2,6 +2,7 @@ services:
   - type: web
     name: savebutton-org
     runtime: ruby
+    region: ohio
     plan: free
     buildCommand: "./bin/render-build.sh"
     startCommand: "./bin/rails server"
@@ -18,4 +19,5 @@ services:
         value: 2
 databases:
   - name: savebutton-org-db
+    region: ohio
     plan: free

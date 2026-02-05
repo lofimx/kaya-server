@@ -8,7 +8,14 @@
       "WebFetch(domain:rubygems.org)",
       "WebFetch(domain:shittycodingagent.ai)",
       "WebFetch(domain:)",
-      "WebFetch(domain:brand.gnome.org)"
+      "WebFetch(domain:brand.gnome.org)",
+      "mcp__render__list_workspaces",
+      "mcp__render__list_services",
+      "mcp__render__list_postgres_instances",
+      "mcp__render__list_logs",
+      "mcp__render__get_service",
+      "mcp__render__get_postgres",
+      "mcp__render__create_web_service"
     ]
   }
 }
