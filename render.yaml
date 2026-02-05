@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: savebutton-org
+    runtime: ruby
+    plan: free
+    buildCommand: "./bin/render-build.sh"
+    startCommand: "./bin/rails server"
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: savebutton-org-db
+          property: connectionString
+      - key: RAILS_MASTER_KEY
+        sync: false # You'll provide this value on Blueprint creation
+      - key: RAILS_ENV
+        value: production
+      - key: WEB_CONCURRENCY
+        value: 2
+databases:
+  - name: savebutton-org-db
+    plan: free
