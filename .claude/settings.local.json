@@ -15,7 +15,8 @@
       "mcp__render__list_logs",
       "mcp__render__get_service",
       "mcp__render__get_postgres",
-      "mcp__render__create_web_service"
+      "mcp__render__create_web_service",
+      "mcp__render__list_deploys"
     ]
   }
 }
