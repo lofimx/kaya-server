@@ -1,8 +1,10 @@
 Rails.application.config.middleware.use OmniAuth::Builder do
+  credentials = Rails.application.credentials
+
   # Google OAuth2
   provider :google_oauth2,
-    ENV["GOOGLE_CLIENT_ID"],
-    ENV["GOOGLE_CLIENT_SECRET"],
+    credentials.dig(:google, :client_id) || ENV["GOOGLE_CLIENT_ID"],
+    credentials.dig(:google, :client_secret) || ENV["GOOGLE_CLIENT_SECRET"],
     {
       scope: "email,profile",
       prompt: "select_account",
@@ -25,8 +27,8 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   # Use 'common' tenant to support both organizational and personal accounts
   # Use 'consumers' for personal accounts only, 'organizations' for work/school only
   provider :microsoft_graph,
-    ENV["MICROSOFT_CLIENT_ID"],
-    ENV["MICROSOFT_CLIENT_SECRET"],
+    credentials.dig(:microsoft, :client_id) || ENV["MICROSOFT_CLIENT_ID"],
+    credentials.dig(:microsoft, :client_secret) || ENV["MICROSOFT_CLIENT_SECRET"],
     {
       # scope: "openid email profile",
       tenant: "common"
