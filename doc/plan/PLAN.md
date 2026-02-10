@@ -7,10 +7,10 @@ LLM agents must create a Markdown plan document **in this directory** (`doc/plan
 
 Before creating the plan, read these documents: 
 
-* [@README.md](./README.md)
-* [@AGENTS.md](./AGENTS.md)
-* [doc/design/DESIGN.md](./doc/design/DESIGN.md)
-* [doc/arch/*.md](./doc/arch/)
+* [@README.md](../../README.md)
+* [@AGENTS.md](../../AGENTS.md)
+* [doc/design/DESIGN.md](../design/DESIGN.md)
+* [doc/arch/*.md](../arch/)
 
 Then create the plan **in `doc/plan/`** and ask any clarifying questions you have. After I answer your questions to eliminate ambiguity, adjust the plan accordingly. Ask more clarifying questions, if required, and repeat the process until all your questions are answered.
 
