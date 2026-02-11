@@ -1,0 +1,46 @@
+# Deploy as a Portainer Stack on a single VPS.
+# Caddy handles TLS termination externally.
+#
+# Required environment variables (set in Portainer or .env):
+#   RAILS_MASTER_KEY  - from config/master.key
+#   POSTGRES_USER     - database user (e.g. "kaya")
+#   POSTGRES_PASSWORD - database password
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: kaya_production
+    volumes:
+      - kaya_pg_data:/var/lib/postgresql/data
+      - ./docker/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d kaya_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/kaya_production
+      SOLID_QUEUE_IN_PUMA: "true"
+    volumes:
+      - kaya_storage:/rails/storage
+    ports:
+      - "127.0.0.1:3000:80"
+
+volumes:
+  kaya_pg_data:
+  kaya_storage:

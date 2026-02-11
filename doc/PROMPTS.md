@@ -142,3 +142,9 @@ Perform a full rename throughout the codebase to rename 'Text' to 'Words' accord
 [@sync.rb](file:///home/steven/work/deobald/kaya-server/script/sync.rb) currently syncs 'anga', 'meta', and 'cache'. However, local apps do not require a complete cache of every bookmarked webpage. Instead of syncing `/cache`, sync `/words` using the `/api/v1/:user_email/words` API as per the updated ADR at [@adr-0003-sync.md](file:///home/steven/work/deobald/kaya-server/doc/arch/adr-0003-sync.md)
 
 Follow the instructions in [@PLAN.md](file:///home/steven/work/deobald/kaya-server/doc/plan/PLAN.md).
+
+## Create a Docker compose file
+
+Create a Docker compose file for this Rails service, for deployment to a Portainer instance. Add all the dependencies (Postgres and so on) as separate containers, such that the Docker compose file can be deployed as a "Stack" on Portainer.
+
+Follow the instructions in [@PLAN.md](file:///home/steven/work/deobald/kaya-server/doc/plan/PLAN.md).
