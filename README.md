@@ -17,6 +17,7 @@ docker compose up --build
 
 # Or just build + push to Docker Hub
 docker compose build
+docker login -u deobald
 docker push deobald/kaya_server:latest
 ```
 
