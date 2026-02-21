@@ -17,7 +17,7 @@
 class User < ApplicationRecord
   has_paper_trail
 
-  has_secure_password validations: false
+  has_secure_password validations: false, reset_token: { expires_in: 45.minutes }
   has_many :sessions, dependent: :destroy
   has_many :identities, dependent: :destroy
   has_many :angas, dependent: :destroy

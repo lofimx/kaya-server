@@ -176,3 +176,9 @@ Password resets do not seem to be sending emails correctly. Check over the Actio
 5. I've configured DNS and verified with Resend that it is working.
 
 Proceed with Resend and add `raise_delivery_errors`, as you suggested.
+
+### Tweaks:
+
+When the user fails to login, only clear the password field. Assume they typed their email correctly and leave the email field as-is.
+
+Change the expiry on the password reset link to 45 minutes, up from 15 minutes.
