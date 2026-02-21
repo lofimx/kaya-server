@@ -156,3 +156,23 @@ Follow the instructions in [@PLAN.md](file:///home/steven/work/deobald/kaya-serv
 No matter what has been saved in Kaya Server, API file listings such as those for routes like `/api/v1/:user_email/anga` should never return URL-unfriendly characters, such as <space> (' '). Files uploaded to Kaya Server should always be URL-encoded when they are saved but on the off-chance an illegal character has made its way into the Kaya Server database, Kaya Server should never display this to client consumers of the API. Only users should ever see filenames with URL-illegal characters in them (comma, space, etc.), in the UI layer.
 
 Write tests to assert that both saving and serving (via API) of files adheres to this rule.
+
+## Add a Rake task to manually reset a user's password given an email
+
+Follow the instructions in [@PLAN.md](file:///home/steven/work/deobald/kaya-server/doc/plan/PLAN.md).
+
+The user "reset password" feature does not work yet, as there is no email service connected. Add a Rake task `kaya:password:reset` so an administrator can manually reset a user's password from the command line, by providing the user's email address.
+
+## Password Reset emails not received
+
+Password resets do not seem to be sending emails correctly. Check over the ActionMailer config to see if there is any configuration missing or if there are external steps required to ensure successful delivery of password reset emails.
+
+### Reply:
+
+1. I've set up a new Resend account. It uses the subdomain 'mail.sendbutton.com'
+2. I've added the Resend API key to Rails credentials as 'resend_api_key'
+3. You can uncomment and update the SMTP block in the production config. Do NOT use the Resend Rubygem; use standard SMTP.
+4. I've set the reply address in [@application_mailer.rb](file:///home/steven/work/deobald/kaya-server/app/mailers/application_mailer.rb) 
+5. I've configured DNS and verified with Resend that it is working.
+
+Proceed with Resend and add `raise_delivery_errors`, as you suggested.
