@@ -182,3 +182,17 @@ Proceed with Resend and add `raise_delivery_errors`, as you suggested.
 When the user fails to login, only clear the password field. Assume they typed their email correctly and leave the email field as-is. Since we assume the password was entered incorrectly, place the cursor in the now-empty password field after the failed login, not the email field.
 
 Change the expiry on the password reset link to 45 minutes, up from 15 minutes.
+
+## Symmetry with mobile app UI
+
+Follow the instructions in [@PLAN.md](file:///home/steven/work/deobald/kaya-server/doc/plan/PLAN.md).
+
+The web UI should maintain symmetry with the mobile app UI (https://github.com/deobald/kaya-flutter). This requires the following changes:
+
+* Move the 'profile-link' and 'profile-avatar' from the upper-right of the screen to an "Account" link under the hamburger menu (below "Everything"). The icon for the "Account" entry in the hamburger menu should be the user's profile photo/avatar, if one is set. Otherwise use a generic profile icon based on [@DESIGN.md](file:///home/steven/work/deobald/kaya-server/doc/design/DESIGN.md) 
+* Move the 'add-button' to the right-hand side of the header.
+* Move the "Logout" button to the bottom of the Account screen, in its own 'account-section' block. The explainer text should be "End your session in this browser."
+* On the Account screen, retain the hamburger menu in the upper-left instead of showing the Save Button logo and 'logo-text'.
+* On the homepage (only visible when the user is logged out) leave the "Save Button" logo and logo-text as-is. Also leave the "Login" and "Sign Up" buttons as-is.
+
+Ask me questions not just about implementation but also about design, in case there are any situations where I'm not considering a potential asymmetry across the webapp.

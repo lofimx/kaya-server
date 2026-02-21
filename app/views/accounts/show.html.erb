@@ -1,3 +1,6 @@
+<% content_for :app_layout, true %>
+<% content_for :hide_add_button, true %>
+
 <div class="account-page" data-controller="avatar-cropper">
   <div class="account-container">
     <div class="account-header">
@@ -123,6 +126,14 @@
             <% end %>
           <% end %>
         </div>
+      </div>
+    </section>
+
+    <section class="account-section">
+      <h2 class="title-4">Log Out</h2>
+      <p class="section-description">End your session in this browser.</p>
+      <div class="form-actions">
+        <%= button_to "Log Out", session_path, method: :delete, class: "btn btn-secondary" %>
       </div>
     </section>
   </div>

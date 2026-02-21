@@ -1544,6 +1544,13 @@ img {
     color: var(--color-text-on-primary);
 }
 
+.hamburger-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-full);
+    object-fit: cover;
+}
+
 /* ============================================
    Everything Page
    ============================================ */
