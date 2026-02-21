@@ -9,9 +9,27 @@
   * `sh install-docker.sh --dry-run`
   * `sudo sh install-docker.sh`
 
+## Kamal
+
+Deploys to a standalone box are done via [Kamal](https://kamal-deploy.org/).
+
+```bash
+# First deployment to a new server (and full redeploys)
+kamal setup
+
+# Updates to a deployment 
+kamal deploy
+
+# Get secrets 
+kamal secrets print
+# KAMAL_REGISTRY_PASSWORD=
+# RAILS_MASTER_KEY=
+# POSTGRES_PASSWORD=
+```
+
 ## Docker
 
-```
+```bash
 # Build and run locally
 docker compose up --build
 
