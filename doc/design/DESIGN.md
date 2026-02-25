@@ -4,9 +4,9 @@ Kaya borrows all its design principles from the [GNOME Human Interface Guideline
 
 ## Icons
 
-Symbolic icons should always use the GNOME HIG icons: https://developer.gnome.org/hig/guidelines/ui-icons.html
+Symbolic icons should always use the GNOME HIG icons: https://developer.gnome.org/hig/guidelines/ui-icons.html or https://lucide.dev/, retaining symmetry with other icons on a screen/view.
 
-All icons used are Creative Commons Zero 1.0 Universal.
+GNOME icons used are Creative Commons Zero 1.0 Universal. Lucide icons are licensed ISC.
 
 ## UI Rules
 

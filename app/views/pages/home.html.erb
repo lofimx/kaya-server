@@ -3,21 +3,31 @@
 <div class="hero">
   <div class="hero-content">
     <h1 class="hero-title">
-      Save everything.<br>
-      <span class="highlight">Find it instantly.</span>
+      Save stuff.<br>
+      <span class="highlight">Find it later.</span>
     </h1>
     <p class="hero-subtitle">
-      A private space for the breadcrumbs of your life.<br>
-      Capture everything and maybe go looking for it later.
+      Save Button is a private, open source, local-first,
+      file-based bookmark & breadcrumb tool with apps for
+      every platform we can think of.
     </p>
     <div class="hero-cta">
-      <%= link_to "Get Started", new_registration_path, class: "btn btn-primary btn-large" %>
+      <%= link_to "Get The Apps", "#apps", class: "btn btn-primary btn-large" %>
       <%= link_to "Learn More", "#features", class: "btn btn-secondary btn-large" %>
     </div>
   </div>
 
   <div class="hero-visual">
     <div class="cards-preview">
+      <div class="preview-card bookmark-card">
+        <div class="card-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <span class="card-label">Bookmarks</span>
+        <p class="card-desc">All your favourite yeaurls</p>
+      </div>
       <div class="preview-card note-card">
         <div class="card-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -27,15 +37,6 @@
         </div>
         <span class="card-label">Notes</span>
         <p class="card-desc">Passing thoughts and fieldstones</p>
-      </div>
-      <div class="preview-card bookmark-card">
-        <div class="card-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-          </svg>
-        </div>
-        <span class="card-label">Bookmarks</span>
-        <p class="card-desc">All your favourite yeaurls</p>
       </div>
       <div class="preview-card document-card">
         <div class="card-icon">
@@ -63,6 +64,10 @@
     </div>
   </div>
 </div>
+
+<section id="apps">
+
+</section>
 
 <section id="features" class="features-section">
   <div class="features-container">
@@ -97,11 +102,13 @@
       <div class="feature">
         <div class="feature-icon purple">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path>
+            <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
           </svg>
         </div>
-        <h3>Private & secure</h3>
+        <h3>Private</h3>
         <p>Your data belongs to you. We don't sell your information or show you ads.</p>
       </div>
     </div>

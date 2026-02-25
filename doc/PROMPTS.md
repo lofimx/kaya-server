@@ -196,3 +196,36 @@ The web UI should maintain symmetry with the mobile app UI (https://github.com/d
 * On the homepage (only visible when the user is logged out) leave the "Save Button" logo and logo-text as-is. Also leave the "Login" and "Sign Up" buttons as-is.
 
 Ask me questions not just about implementation but also about design, in case there are any situations where I'm not considering a potential asymmetry across the webapp.
+
+## Home Page - Apps
+
+Read [@PLAN.md](file:///home/steven/work/deobald/kaya-server/doc/plan/PLAN.md).
+
+Other than the "Save Button" / "Self-host" section, use the standard PNG icons for all of the following sections. Source them from the web.
+
+Fill out the "apps" section (section title: "Get The Apps"), with 3 parts:
+
+1. Mobile Apps
+2. Browser Extensions
+3. Desktop Apps
+4. Server
+
+The "Mobile Apps" section should contain a blurb saying "Available for iPhone, iPad, Android phones, and Android tablets." and contain 2 buttons to link to the App Store and Play Store.
+
+The "Browser Extensions" section should contain a blurb saying "Save Button works on most browsers. If your browser is not listed, try installing from the Chromium link." The section should contain icons for Firefox, Chrome, Edge, Safari, Chromium, Vivaldi, Brave, and Arc. Each icon should have the browser name under it as a caption and link to the extensions accordingly:
+
+* Chrome: https://chromewebstore.google.com/detail/save-button/eeoleaffndkjkgbdhaojcgehcklfihid
+* Firefox: https://addons.mozilla.org/en-US/firefox/addon/save-button/
+* Edge: https://microsoftedge.microsoft.com/addons/detail/save-button/ldcpchibphbafmclockfeoiffafjdekj
+* Safari: https://apps.apple.com/app/save-button-for-safari/id6759535767
+* Chromium: https://chromewebstore.google.com/detail/save-button/eeoleaffndkjkgbdhaojcgehcklfihid
+* Vivaldi: https://chromewebstore.google.com/detail/save-button/eeoleaffndkjkgbdhaojcgehcklfihid
+* Brave: https://chromewebstore.google.com/detail/save-button/eeoleaffndkjkgbdhaojcgehcklfihid
+* Arc: https://chromewebstore.google.com/detail/save-button/eeoleaffndkjkgbdhaojcgehcklfihid
+
+The "Desktop Apps" section should contain icons for Windows, MacOS, and Linux -- with the name of each as a caption. Each should have "(Coming Soon)" on a new line, under the caption.
+
+The "Server" section should contain a blurb saying "Grab an account with savebutton.com or, if you're a big nerd, host the backup service yourself." contain two icons: The "Save Button" icon ([@yellow-floppy3.svg](file:///home/steven/work/deobald/kaya-server/doc/design/yellow-floppy3.svg)) with the "Sign Up" CTA button from the header underneath and the old "Kaya" icon ([@old-kaya-icon.svg](file:///home/steven/work/deobald/kaya-server/doc/design/old-kaya-icon.svg) ) with the text "Self-Host" underneath. Between these two options should be "- or -" indicating that they are mutually exclusive. The icons should link to:
+
+* Save Button: Rails `new_registration_path`
+* Self-Host: https://github.com/deobald/kaya-server/
