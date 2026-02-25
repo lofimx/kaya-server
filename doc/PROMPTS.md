@@ -229,3 +229,21 @@ The "Server" section should contain a blurb saying "Grab an account with savebut
 
 * Save Button: Rails `new_registration_path`
 * Self-Host: https://github.com/deobald/kaya-server/
+
+---
+
+## 2026-02-25 - Home Page Apps Section Completion
+
+Completed the "Get The Apps" section on the home page with:
+
+- **Mobile Apps**: App Store and Play Store buttons with appropriate SVG/PNG badges
+- **Browser Extensions**: 8 browser icons (Firefox, Chrome, Edge, Safari, Chromium, Vivaldi, Brave, Arc) with links to extension stores
+- **Desktop Apps**: Windows, macOS, and Linux icons with "Coming Soon" status
+- **Server**: Save Button icon with "Sign Up" CTA and Kaya icon with "Self-Host" link, separated by "- or -"
+
+Added comprehensive CSS styling with responsive breakpoints for mobile view. Icons were already downloaded and placed in `public/icons/` directories.
+
+Files modified:
+- `app/views/pages/home.html.erb` - Added complete `#apps` section HTML
+- `app/assets/stylesheets/application.css` - Added `.apps-section` styles with responsive design
+- `doc/plan/2026-02-25-home-page-apps-section.md` - Updated progress log with completion note

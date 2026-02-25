@@ -70,6 +70,20 @@ Add "Get The Apps" section to the home page between the hero and features sectio
 - `public/icons/kaya.svg` — copied from `doc/design/old-kaya-icon.svg`
 
 ### ALL ICONS COMPLETE — remaining work:
-- Build the `#apps` section HTML in `app/views/pages/home.html.erb`
-- Add CSS for the apps section in `app/assets/stylesheets/application.css`
-- Add responsive breakpoints for the apps section
+- ~~Build the `#apps` section HTML in `app/views/pages/home.html.erb`~~
+- ~~Add CSS for the apps section in `app/assets/stylesheets/application.css`~~
+- ~~Add responsive breakpoints for the apps section~~
+
+### COMPLETED (2026-02-25)
+- Built the complete `#apps` section HTML with:
+  - Mobile Apps section with App Store and Play Store buttons
+  - Browser Extensions section with 8 browser icons (Firefox, Chrome, Edge, Safari, Chromium, Vivaldi, Brave, Arc)
+  - Desktop Apps section with Windows, macOS, and Linux icons marked "Coming Soon"
+  - Server section with Save Button / Sign Up option and Kaya / Self-Host option
+- Added comprehensive CSS including:
+  - Apps section layout with 2-column grid
+  - Store button styling
+  - Browser grid with 4-column layout
+  - Platform list styling
+  - Server options with icons and CTAs
+  - Responsive breakpoints for mobile (480px, 640px, 768px, 900px)
