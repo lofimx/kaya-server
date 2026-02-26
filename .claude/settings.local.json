@@ -22,7 +22,8 @@
       "WebFetch(domain:guides.rubyonrails.org)",
       "WebFetch(domain:www.ivanturkovic.com)",
       "WebFetch(domain:fonts.googleapis.com)",
-      "WebFetch(domain:rsms.me)"
+      "WebFetch(domain:rsms.me)",
+      "Bash(rake test:*)"
     ]
   }
 }

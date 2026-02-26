@@ -68,6 +68,9 @@ Rails.application.routes.draw do
     post "anga", to: "anga#create", as: "anga_create"
   end
 
+  # Static pages
+  get "get-the-apps", to: "pages#get_the_apps", as: :get_the_apps
+
   # Homepage
   root "pages#home"
 end
