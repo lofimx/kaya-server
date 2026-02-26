@@ -842,8 +842,8 @@ img {
 }
 
 .feature-icon.orange {
-    background: #ffda44; /* Yellow 1 */
-    color: #ffb900; /* Yellow 5 */
+    background: #ffed99; /* Yellow 1 (lightened) */
+    color: #936400; /* Yellow 5 (darkened from #ffb900) */
 }
 
 .feature-icon.black {
