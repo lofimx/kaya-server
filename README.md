@@ -13,14 +13,29 @@
 
 Deploys to a standalone box are done via [Kamal](https://kamal-deploy.org/).
 
-```bash
-# RAILS_MASTER_KEY comes from `config/master.key`
-source .env
-# export POSTGRES_USER=
-# export POSTGRES_PASSWORD=
-# export KAMAL_REGISTRY_PASSWORD=
+**Setup:**
 
+```bash
+# set your master key
+vim config/master.key
+
+# set your credentials
+cat config/credentials.yml.example
+rails credentials:edit
+
+# set env vars
+cp .env.example .env
+
+# add yourself to docker users (in case you aren't)
+sudo usermod -aG docker $USER
+newgrp docker # or logout
+```
+
+**Deploy:**
+
+```bash
 # First deployment to a new server (and full redeploys)
+source .env
 kamal setup
 
 # Updates to a deployment 
@@ -35,14 +50,16 @@ kamal secrets print
 
 ## Docker
 
+If you don't like Kamal or you don't have a fresh box to push to, you can deploy with Docker directly:
+
 ```bash
 # Build and run locally
 docker compose up --build
 
 # Or just build + push to Docker Hub
 docker compose build
-docker login -u deobald
-docker push deobald/kaya_server:latest
+docker login -u $YOUR_DOCKERHUB_USER
+docker push $YOUR_DOCKERHUB_USER/kaya_server:latest
 ```
 
 ## TODO
