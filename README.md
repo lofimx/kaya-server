@@ -14,6 +14,12 @@
 Deploys to a standalone box are done via [Kamal](https://kamal-deploy.org/).
 
 ```bash
+# RAILS_MASTER_KEY comes from `config/master.key`
+source .env
+# export POSTGRES_USER=
+# export POSTGRES_PASSWORD=
+# export KAMAL_REGISTRY_PASSWORD=
+
 # First deployment to a new server (and full redeploys)
 kamal setup
 
