@@ -846,6 +846,11 @@ img {
     color: #936400; /* Yellow 5 (darkened from #ffb900) */
 }
 
+.feature-icon.red {
+    background: #f66151; /* Red 1 */
+    color: #8b1a10; /* Red 5 */
+}
+
 .feature-icon.black {
     background: #555555; /* Black 1 */
     color: #000000; /* Black 5 */
