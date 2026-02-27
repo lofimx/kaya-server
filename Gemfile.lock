@@ -477,7 +477,7 @@ GEM
       racc (~> 1.7)
     tsort (0.2.0)
     ttfunk (1.7.0)
-    turbo-rails (2.0.20)
+    turbo-rails (2.0.23)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
     tzinfo (2.0.6)
