@@ -32,7 +32,8 @@
       "WebFetch(domain:rubyonrails.org)",
       "WebFetch(domain:www.mail-archive.com)",
       "Bash(git stash:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(ruby -e:*)"
     ]
   }
 }

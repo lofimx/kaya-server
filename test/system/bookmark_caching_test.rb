@@ -35,8 +35,8 @@ class BookmarkCachingTest < ApplicationSystemTestCase
     # Debug: check if tiles are present
     assert_selector ".anga-grid", wait: 5
 
-    # Find and click the bookmark tile
-    tile = find(".anga-tile", text: @anga.filename, wait: 10)
+    # Find and click the bookmark tile (tile displays the URL for bookmarks)
+    tile = find(".anga-tile", text: @bookmark.url, wait: 10)
     assert tile, "Bookmark tile should be visible"
 
     # Verify the tile shows the default bookmark icon (not cached yet)
@@ -88,8 +88,8 @@ class BookmarkCachingTest < ApplicationSystemTestCase
     # Debug: check if tiles are present
     assert_selector ".anga-grid", wait: 5
 
-    # Find and click the invalid bookmark tile
-    tile = find(".anga-tile", text: invalid_anga.filename, wait: 10)
+    # Find and click the invalid bookmark tile (tile displays the URL for bookmarks)
+    tile = find(".anga-tile", text: invalid_bookmark.url, wait: 10)
     tile.click
 
     # The modal should open
