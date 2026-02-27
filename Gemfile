@@ -97,6 +97,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 
-  # Pin minitest to 5.x until Rails is compatible with minitest 6.x
   gem "minitest", "~> 6.0"
+  gem "minitest-mock"
 end
