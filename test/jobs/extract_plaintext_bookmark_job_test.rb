@@ -60,6 +60,33 @@ class ExtractPlaintextBookmarkJobTest < ActiveJob::TestCase
     assert anga.words.extract_error.present?
   end
 
+  test "extracts content from non-article pages where readability misses body text" do
+    user = create(:user)
+    anga = create(:anga, :bookmark, user: user, filename: "2024-01-01T120000-costco-ride.url")
+    bookmark = create(:bookmark, anga: anga, url: "https://bort.likes.it.com/moment/hPpWbvcHWe", cached_at: Time.current)
+
+    # This HTML mimics a non-article page (activity tracker) where the meaningful
+    # text content is short and surrounded by heavy structural HTML (inline SVGs,
+    # large JSON data attributes, stats grids). ruby-readability's heuristics fail
+    # on this kind of page, extracting only the h1 title while ignoring the
+    # activity notes that contain the searchable word "costco".
+    bookmark.html_file.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/non_article_page_timeline_likes_it_com.html")),
+      filename: "index.html",
+      content_type: "text/html"
+    )
+
+    ExtractPlaintextBookmarkJob.perform_now(bookmark.id)
+
+    anga.reload
+    assert anga.words.present?, "Expected words record to be created"
+    assert anga.words.extracted?, "Expected words to be marked as extracted"
+
+    content = anga.words.file.download.force_encoding("UTF-8").downcase
+    assert_includes content, "costco",
+      "Expected extracted plaintext to contain 'costco' from Activity Notes section"
+  end
+
   test "updates existing words record on re-extraction" do
     user = create(:user)
     anga = create(:anga, :bookmark, user: user, filename: "2024-01-01T120000-retry.url")

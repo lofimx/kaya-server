@@ -247,3 +247,21 @@ Files modified:
 - `app/views/pages/home.html.erb` - Added complete `#apps` section HTML
 - `app/assets/stylesheets/application.css` - Added `.apps-section` styles with responsive design
 - `doc/plan/2026-02-25-home-page-apps-section.md` - Updated progress log with completion note
+
+---
+
+## 2026-02-28 Readability => Nokogiri For All Pages
+
+Full Text extraction into the 'words' file corresponding to a webpage should almost always extract all text on a given page. Rather than assuming a webpage is an article, `ExtractPlaintextBookmarkJob` should
+detect **known** article-oriented websites. It should run the website URL and HTML content through respective filters (`ArticleUrlFilter` and `ArticleHtmlFilter`), which are instantiated with the URL and HTML. These `Filter` objects will have an `#article?` method on them which will return true if:
+
+* URL matches a predefined list of "news" websites
+* HTML matches known good "news" / "blog" software for generating HTML "post" output: Hugo, Ghost, Jekyll, etc.
+
+These predefined lists can be configuration for now. We might lift them into the database later. You will need to pre-populate these lists by searching for items to populate them with. Be certain that the items added to these lists are "news" websites or "blog post" generators - we want to avoid false positives.
+
+If either `*Filter` object matches, then `ruby-readability` can be used to extract the article content.
+
+If neither `*Filter` object matches, then the default option should be used: extract all (non-tag) text content from the HTML.
+
+There is already a failing test at `test/jobs/extract_plaintext_bookmark_job_test.rb` that can be used to verify this new behaviour. You can write additional tests using sample data from real websites.
