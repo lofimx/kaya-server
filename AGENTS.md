@@ -120,6 +120,10 @@ Kaya relies on fat models, service objects, and thin views. Where possible, Java
 * unit tests should test models heavily, controllers lightly, and views not at all
 * when fixing bugs, always try to write a failing unit test first; keep the test
 
+### Linting
+
+Always run `bin/rubocop` after making changes to code or tests.
+
 ### Logging
 
 **Always add appropriate logs during development.**

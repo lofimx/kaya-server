@@ -75,7 +75,7 @@ class ArticleFilters::ArticleHtmlFilterTest < ActiveSupport::TestCase
   # --- Non-article pages ---
 
   test "article? returns false for page without any article signals" do
-    html = '<html><head><title>Dashboard</title></head><body><div>Stats</div></body></html>'
+    html = "<html><head><title>Dashboard</title></head><body><div>Stats</div></body></html>"
     assert_not ArticleFilters::ArticleHtmlFilter.new(html).article?
   end
 
