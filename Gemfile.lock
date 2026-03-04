@@ -233,7 +233,7 @@ GEM
     minitest-mock (5.27.0)
     mize (0.6.1)
     msgpack (1.8.0)
-    multi_xml (0.8.0)
+    multi_xml (0.8.1)
       bigdecimal (>= 3.1, < 5)
     net-http (0.9.1)
       uri (>= 0.11.1)
@@ -280,7 +280,7 @@ GEM
     omniauth-apple (1.4.0)
       json-jwt
       omniauth-oauth2
-    omniauth-google-oauth2 (1.2.1)
+    omniauth-google-oauth2 (1.2.2)
       jwt (>= 2.9.2)
       oauth2 (~> 2.0)
       omniauth (~> 2.0)
