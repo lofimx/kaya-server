@@ -51,30 +51,30 @@
   </div>
 </div>
 
-<div class="apps-subsection">
+<div class="apps-subsection" data-controller="download-modal">
   <h3 class="apps-subtitle">Desktop Apps</h3>
   <div class="platform-list">
-    <div class="platform-item">
+    <button type="button" class="platform-item" data-action="click->download-modal#open" data-download-platform="windows">
       <img src="/icons/platforms/windows.png" alt="Windows" class="platform-icon">
       <div class="platform-info">
         <span class="platform-name">Windows</span>
-        <span class="platform-status">(Coming Soon)</span>
       </div>
-    </div>
-    <div class="platform-item">
+    </button>
+    <button type="button" class="platform-item" data-action="click->download-modal#open" data-download-platform="macos">
       <img src="/icons/platforms/macos.png" alt="macOS" class="platform-icon">
       <div class="platform-info">
         <span class="platform-name">macOS</span>
-        <span class="platform-status">(Coming Soon)</span>
       </div>
-    </div>
-    <a href="https://github.com/lofimx/kaya-gtk/releases" class="platform-item" target="_blank" rel="noopener noreferrer">
-        <img src="/icons/platforms/linux.png" alt="Linux" class="platform-icon">
-        <div class="platform-info">
-            <span class="platform-name">Linux</span>
-        </div>
-    </a>
+    </button>
+    <button type="button" class="platform-item" data-action="click->download-modal#open" data-download-platform="linux">
+      <img src="/icons/platforms/linux.png" alt="Linux" class="platform-icon">
+      <div class="platform-info">
+        <span class="platform-name">Linux</span>
+      </div>
+    </button>
   </div>
+
+  <%= render "shared/download_modal" %>
 </div>
 
 <div class="apps-subsection">

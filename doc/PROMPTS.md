@@ -283,3 +283,32 @@ The result of this POST request should return a JSON document which includes the
 * GET: `share/:user_id/anga/:filename`
 
 If you don't have any questions for planning, just go ahead and implement.
+
+## Dynamic Desktop Apps Content
+
+Read [@PLAN.md](file:///home/steven/work/lofimx/kaya-server/doc/plan/PLAN.md).
+
+Instead of sending the user to the "releases" page on GitHub, clicking any of the desktop operating systems on [@_apps_content.html.erb](file:///home/steven/work/lofimx/kaya-server/app/views/shared/_apps_content.html.erb) should pop up a modal dialog that offers the latest release packages for any given operating system:
+
+* Windows: `.msi` from https://github.com/lofimx/kaya-wpf/releases
+* MacOS: x86_64 and arm64 `.dmg`s from https://github.com/lofimx/kaya-gtk/releases
+* Linux: AUR, deb, ebuild, flatpak, rpm, snap from https://github.com/lofimx/kaya-gtk/releases
+
+The modal dialog should present buttons similar to the Desktop Apps buttons, with a logo on the left and a description for each option:
+
+**Windows:**
+* x86 Windows Installer
+
+**Mac:**
+* Intel (x86)
+* Apple Silicon
+
+**Linux:**
+* Arch logo => link to AUR for savebutton
+* Debian / Ubuntu (overlapping) logo => deb
+* Gentoo logo => ebuild
+* Flatpak logo => flatpak
+* Fedora logo => rpm
+* Ubuntu logo => snap
+
+The final links can link directly to the most recent GitHub artifact but shouldn't redirect the user to GitHub; just use GitHub as though it were a CDN for builds.

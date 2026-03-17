@@ -2592,6 +2592,163 @@ img {
 }
 
 /* ============================================
+   Download Modal
+   ============================================ */
+.download-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-4);
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.download-modal.active {
+    display: flex;
+}
+
+.download-modal-dialog {
+    background: var(--color-surface);
+    border-radius: var(--radius-xlarge);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-large);
+    width: 100%;
+    max-width: 560px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.download-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-2) var(--spacing-3);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-surface-alt);
+}
+
+.download-modal-title {
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text);
+    margin: 0;
+}
+
+.download-modal-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: var(--radius-medium);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.download-modal-close:hover {
+    background: var(--color-border);
+    color: var(--color-text);
+}
+
+.download-modal-close:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.download-modal-content {
+    padding: var(--spacing-3);
+}
+
+.download-panel.hidden {
+    display: none;
+}
+
+.download-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-2);
+}
+
+.download-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-2);
+    background: var(--color-surface-alt);
+    border-radius: var(--radius-medium);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+    cursor: pointer;
+    min-height: 48px;
+}
+
+button.platform-item {
+    cursor: pointer;
+    font-family: var(--font-family);
+    font-size: inherit;
+    color: inherit;
+}
+
+.download-item:hover {
+    background: var(--color-surface);
+    border-color: var(--color-primary);
+    transform: translateY(-2px);
+}
+
+.download-item:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.download-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.download-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+}
+
+.download-name {
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
+}
+
+.download-format {
+    font-size: var(--font-size-caption);
+    color: var(--color-text-muted);
+}
+
+/* Download Modal Responsive */
+@media (max-width: 480px) {
+    .download-modal {
+        padding: var(--spacing-2);
+    }
+
+    .download-modal-dialog {
+        max-width: 100%;
+    }
+
+    .download-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
    Preview Modal with Sidebar
    Following GNOME HIG patterns
    ============================================ */
